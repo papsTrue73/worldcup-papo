@@ -7,7 +7,7 @@ const LANG = {
   es: {
     // Header
     brandSub: "Mundial 2026",
-    brandTitle: "Centro de Mando del Mundial 2026 de Papo",
+    brandTitle: "Centro de Mando del Mundial 2026 - Papo",
     brandDesc: "Cuatro vistas conectadas: Partidos del Día, Mapa de Partidos, Estadísticas y Polla Mundialista.",
     dataMode: "Modo de datos:",
     apiLive: "API en Vivo Conectada",
@@ -342,6 +342,9 @@ const DEMO_DATA = {
 };
 
 const DEMO_PLAYERS = [
+  {name:"Che",group:"friends",champion:"Argentina",goldenBoot:"Álvarez",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Uruguay",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:1,a:0},1:{r:"D",h:1,a:1},2:{r:"W",h:2,a:1},3:{r:"W",h:3,a:0}}},
   {name:"Chucky",group:"friends",champion:"Argentina",goldenBoot:"Mbappé",
     groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
     matches:{0:{r:"W",h:2,a:1},1:{r:"D",h:1,a:1},2:{r:"W",h:1,a:0},3:{r:"W",h:2,a:0}}},
@@ -366,6 +369,9 @@ const DEMO_PLAYERS = [
   {name:"Papo",group:"friends",champion:"Colombia",goldenBoot:"Luis Díaz",
     groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
     matches:{0:{r:"W",h:2,a:1},1:{r:"D",h:1,a:1},2:{r:"W",h:2,a:0},3:{r:"D",h:1,a:1}}},
+  {name:"Stui",group:"friends",champion:"France",goldenBoot:"Mbappé",
+    groupWinners:{A:"Mexico",B:"Switzerland",C:"Brazil",D:"USA",E:"Germany",F:"Japan",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"Croatia"},
+    matches:{0:{r:"W",h:2,a:1},1:{r:"W",h:3,a:1},2:{r:"D",h:1,a:1},3:{r:"D",h:0,a:0}}},
   {name:"Arieh",group:"family",champion:"Argentina",goldenBoot:"Mbappé",
     groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
     matches:{0:{r:"W",h:3,a:1},1:{r:"D",h:2,a:2},2:{r:"W",h:1,a:0},3:{r:"W",h:2,a:0}}},
