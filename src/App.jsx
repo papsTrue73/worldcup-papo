@@ -1,8 +1,198 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo} from "react";
 
 // ─────────────────────────────────────────────
-//  DATA LAYER
+//  TRANSLATIONS
 // ─────────────────────────────────────────────
+const LANG = {
+  es: {
+    // Header
+    brandSub: "Mundial 2026 de Papo",
+    brandTitle: "Centro de Mando del Mundial 2026 de Papo",
+    brandDesc: "Cuatro vistas conectadas: Partidos del Día, Mapa de Partidos, Estadísticas y Polla Mundialista.",
+    dataMode: "Modo de datos:",
+    apiLive: "API en Vivo Conectada",
+    demoActive: "Modo Demo Activo",
+    manualMode: "Modo Manual",
+    simulate: "Simular datos de API",
+    reset: "Reiniciar datos",
+    matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
+    finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
+    // Nav
+    navHome: "Inicio / Hoy", navFixtures: "Partidos", navStats: "Estadísticas", navPolla: "Polla Mundialista",
+    // Status
+    statusFt: "Final", statusLive: "En Vivo", statusUpcoming: "Próximo",
+    // Home
+    todayGames: "PARTIDOS DEL DÍA", liveNow: "EN VIVO", completed: "FINALIZADOS", comingNext: "PRÓXIMOS",
+    todayDesc: "Partidos agrupados por día con marcadores y estado. Haz clic en un partido para ver detalles.",
+    selectMatch: "Selecciona un partido de la lista para ver detalles, eventos y estadísticas.",
+    noMatches: "No hay partidos programados para esta fecha.",
+    liveReady: "Listo",
+    // Match detail
+    groupStage: "FASE DE GRUPOS · GRUPO",
+    matchEvents: "Eventos del Partido", liveStats: "Estadísticas en Vivo",
+    noEvents: "Sin eventos registrados aún.",
+    editMatch: "Editar datos del partido",
+    potmLabel: "Jugador del partido:",
+    possession: "Posesión", shots: "Tiros", shotsOnTarget: "Tiros a Puerta",
+    corners: "Esquinas", fouls: "Faltas",
+    // Edit modal
+    editTitle: "EDITAR PARTIDO", statusLabel: "Estado", scoreLabel: "Goles",
+    potmInput: "Jugador del Partido",
+    eventsInput: "Eventos (uno por línea: tipo|jugador|equipo|minuto|detalle)",
+    statsInput: "Estadísticas (local,visitante)",
+    possInput: "Posesión %", shotsInput: "Tiros", sotInput: "Tiros a Puerta",
+    cornersInput: "Esquinas",
+    cancel: "Cancelar", save: "Guardar",
+    optUpcoming: "Próximo", optLive: "En Vivo", optFt: "Final",
+    // Fixtures
+    played: "jugados", all: "Todos",
+    // Fetch
+    apiTitle: "API EN VIVO", apiPlaceholder: "Pega tu API key de football-data.org",
+    fetchScores: "Obtener Marcadores", fetchDetails: "Obtener Detalles",
+    fetching: "Cargando...", freeTier: "Gratis · 10 req/min",
+    apiKeyError: "Pega tu API key de football-data.org",
+    apiInvalid: "API key inválida o expirada",
+    apiRateLimit: "Límite de solicitudes — espera 60s e intenta de nuevo",
+    apiUpdated: "partido(s) actualizados. Haz clic en \"Obtener Detalles\" para eventos y estadísticas.",
+    apiNoResults: "Sin resultados nuevos. El torneo inicia el 11 de junio de 2026.",
+    apiNoFinished: "Sin partidos finalizados nuevos.",
+    apiLoaded: "Detalles cargados para",
+    apiFetching: "Cargando detalles para",
+    apiFetchFirst: "Obtén marcadores primero, luego detalles",
+    apiKeyFirst: "Ingresa la API key primero",
+    apiCapped: "máximo 9 — vuelve a buscar para más",
+    // Stats
+    tournamentOverview: "RESUMEN DEL TORNEO",
+    matchesPlayed: "Partidos Jugados", goalsScored: "Goles Anotados",
+    goalsPerGame: "Goles / Partido", totalGoals: "Total de Goles",
+    yellowCards: "Tarjetas Amarillas", redCards: "Tarjetas Rojas",
+    topScorers: "GOLEADORES", noGoals: "Sin goles aún.",
+    potmAwards: "PREMIOS JUGADOR DEL PARTIDO", noAwards: "Sin premios aún.",
+    topAttacking: "EQUIPOS MÁS OFENSIVOS", noData: "Sin datos aún.",
+    groupLeaders: "LÍDERES DE GRUPO",
+    shotsLabel: "tiros", onTargetLabel: "a puerta", cornersLabel: "esquinas",
+    // Team stats
+    selectTeam: "SELECCIONA UN EQUIPO PARA ESTADÍSTICAS DETALLADAS",
+    backToTournament: "← Volver a Estadísticas del Torneo",
+    inGroup: "en Grupo", noMatchesYet: "Sin partidos jugados aún.",
+    matchResults: "RESULTADOS", teamScorers: "GOLEADORES DEL EQUIPO",
+    discipline: "DISCIPLINA", yellow: "Amarilla", red: "Roja",
+    perfMetrics: "MÉTRICAS DE RENDIMIENTO",
+    goalsScoredLabel: "Goles Anotados", goalsConceded: "Goles Recibidos",
+    totalShots: "Total de Tiros", cornersWon: "Esquinas Ganadas",
+    foulsCommitted: "Faltas Cometidas",
+    matchByMatch: "ESTADÍSTICAS POR PARTIDO",
+    opponent: "Rival", result: "Resultado",
+    pj: "PJ", g: "G", e: "E", p: "P", gf: "GF", gc: "GC", dg: "DG",
+    pts: "Pts", avgPoss: "Pos. Prom.", cleanSheet: "Valla Inv.",
+    // Polla
+    pollaTitle: "POLLA MUNDIALISTA",
+    pollaDesc: "Resultado correcto (V/E/D) = 3 pts · Marcador exacto = +5 pts · Ganador grupo = 5 pts · Campeón = 15 pts · Bota de Oro = 10 pts",
+    importPlayers: "Importar jugadores",
+    importDesc: "Pega datos JSON de los participantes. Usa el convertidor de Excel para generar el JSON desde los archivos .xlsx",
+    importBtn: "📋 Importar JSON", importClose: "Cerrar", importGo: "Importar",
+    imported: "importado", importedPlural: "importados",
+    friends: "AMIGOS", family: "FAMILIA", players: "jugadores",
+    showDemo: "Datos demo", noPlayers: "Sin jugadores. Importa datos o activa el demo.",
+    pos: "Pos", name: "Nombre", resultsCol: "Resultado", exactCol: "Exacto",
+    groupCol: "Grupo", bonusCol: "Bonos", totalCol: "Total",
+    back: "← Volver", totalPoints: "PUNTOS TOTALES",
+    preTournament: "PICKS PRE-TORNEO", champion: "Campeón", goldenBoot: "Bota de Oro",
+    groupWinners: "GANADORES DE GRUPO", matchPredictions: "POLLA MUNDIALISTA",
+    pred: "Pred", real: "Real", noPlayedYet: "Sin partidos jugados aún.",
+    resultados: "Resultados", exactos: "Exactos", grupos: "Grupos", bonos: "Bonos",
+    // Events
+    evGoal: "Gol", evPenalty: "Penal", evOwnGoal: "Autogol",
+    evFreeKick: "Tiro Libre", evHeader: "Cabezazo", evFoul: "Falta",
+    evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
+  },
+  en: {
+    brandSub: "Papo's 2026 World Cup",
+    brandTitle: "Papo's 2026 World Cup Command Center",
+    brandDesc: "Four connected views: Today's Games, Fixture Map, Statistics Center and Prediction Game.",
+    dataMode: "Data mode:",
+    apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
+    simulate: "Simulate API refresh", reset: "Reset data",
+    matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
+    finished: "completed", liveCount: "live", upcomingCount: "upcoming",
+    navHome: "Home / Today", navFixtures: "Fixture Map", navStats: "Statistics Center", navPolla: "Polla Mundialista",
+    statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
+    todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
+    todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
+    selectMatch: "Select a match from the list to view details, events, and live stats.",
+    noMatches: "No matches scheduled for this date.",
+    liveReady: "Live-ready",
+    groupStage: "GROUP STAGE · GROUP",
+    matchEvents: "Match Events", liveStats: "Live Stats",
+    noEvents: "No events recorded yet.",
+    editMatch: "Edit match data", potmLabel: "Player of the game:",
+    possession: "Possession", shots: "Shots", shotsOnTarget: "Shots on Target",
+    corners: "Corners", fouls: "Fouls",
+    editTitle: "EDIT MATCH", statusLabel: "Status", scoreLabel: "Score",
+    potmInput: "Player of the Game",
+    eventsInput: "Events (one per line: type|player|team|minute|detail)",
+    statsInput: "Match Stats (home,away)",
+    possInput: "Possession %", shotsInput: "Shots", sotInput: "Shots on Target",
+    cornersInput: "Corners",
+    cancel: "Cancel", save: "Save",
+    optUpcoming: "Upcoming", optLive: "Live", optFt: "Full Time",
+    played: "played", all: "All",
+    apiTitle: "LIVE API", apiPlaceholder: "Paste your football-data.org API key",
+    fetchScores: "Fetch Scores", fetchDetails: "Fetch Details",
+    fetching: "Fetching...", freeTier: "Free tier · 10 req/min",
+    apiKeyError: "Paste your football-data.org API key above",
+    apiInvalid: "Invalid or expired API key",
+    apiRateLimit: "Rate limit hit — wait 60s and retry",
+    apiUpdated: "match(es) updated. Click \"Fetch Details\" for events & stats.",
+    apiNoResults: "No new results found. Tournament starts June 11, 2026.",
+    apiNoFinished: "No new finished matches found.",
+    apiLoaded: "Loaded details for", apiFetching: "Fetching details for",
+    apiFetchFirst: "Fetch scores first, then fetch details",
+    apiKeyFirst: "Enter API key first", apiCapped: "capped at 9 — refetch for more",
+    tournamentOverview: "TOURNAMENT OVERVIEW",
+    matchesPlayed: "Matches Played", goalsScored: "Goals Scored",
+    goalsPerGame: "Goals / Game", totalGoals: "Total Goals",
+    yellowCards: "Yellow Cards", redCards: "Red Cards",
+    topScorers: "TOP SCORERS", noGoals: "No goals yet.",
+    potmAwards: "PLAYER OF THE MATCH AWARDS", noAwards: "No awards yet.",
+    topAttacking: "TOP ATTACKING TEAMS", noData: "No data yet.",
+    groupLeaders: "GROUP LEADERS",
+    shotsLabel: "shots", onTargetLabel: "on target", cornersLabel: "corners",
+    selectTeam: "SELECT A TEAM FOR DETAILED STATS",
+    backToTournament: "← Back to Tournament Stats",
+    inGroup: "in Group", noMatchesYet: "No matches played yet.",
+    matchResults: "MATCH RESULTS", teamScorers: "GOALSCORERS",
+    discipline: "DISCIPLINE", yellow: "Yellow", red: "Red",
+    perfMetrics: "PERFORMANCE METRICS",
+    goalsScoredLabel: "Goals Scored", goalsConceded: "Goals Conceded",
+    totalShots: "Total Shots", cornersWon: "Corners Won",
+    foulsCommitted: "Fouls Committed",
+    matchByMatch: "MATCH-BY-MATCH STATS",
+    opponent: "Opponent", result: "Result",
+    pj: "MP", g: "W", e: "D", p: "L", gf: "GF", gc: "GA", dg: "GD",
+    pts: "Pts", avgPoss: "Avg Poss.", cleanSheet: "Clean Sh.",
+    pollaTitle: "POLLA MUNDIALISTA",
+    pollaDesc: "Correct result (W/D/L) = 3 pts · Exact score = +5 pts · Group winner = 5 pts · Champion = 15 pts · Golden Boot = 10 pts",
+    importPlayers: "Import players",
+    importDesc: "Paste JSON data from participants. Use the Excel converter to generate JSON from .xlsx files",
+    importBtn: "📋 Import JSON", importClose: "Close", importGo: "Import",
+    imported: "imported", importedPlural: "imported",
+    friends: "FRIENDS", family: "FAMILY", players: "players",
+    showDemo: "Demo data", noPlayers: "No players. Import data or enable demo.",
+    pos: "Pos", name: "Name", resultsCol: "Results", exactCol: "Exact",
+    groupCol: "Groups", bonusCol: "Bonus", totalCol: "Total",
+    back: "← Back", totalPoints: "TOTAL POINTS",
+    preTournament: "PRE-TOURNAMENT PICKS", champion: "Champion", goldenBoot: "Golden Boot",
+    groupWinners: "GROUP WINNERS", matchPredictions: "MATCH PREDICTIONS",
+    pred: "Pred", real: "Actual", noPlayedYet: "No matches played yet.",
+    resultados: "Results", exactos: "Exact", grupos: "Groups", bonos: "Bonus",
+    evGoal: "Goal", evPenalty: "Penalty", evOwnGoal: "Own Goal",
+    evFreeKick: "Free Kick", evHeader: "Header", evFoul: "Foul",
+    evYellow: "Yellow Card", evRed: "Red Card",
+  }
+};
+
+let _t = LANG.es;
 
 const GROUPS = {
   A:[ {name:"Mexico",flag:"🇲🇽",conf:"CONCACAF"},{name:"South Korea",flag:"🇰🇷",conf:"AFC"},{name:"South Africa",flag:"🇿🇦",conf:"CAF"},{name:"Czechia",flag:"🇨🇿",conf:"UEFA"} ],
@@ -200,10 +390,11 @@ function calcStandings(g, fixtures) {
 //  STATUS BADGE
 // ─────────────────────────────────────────────
 function EstadoBadge({status}) {
+  const t=_t;
   const cfg = {
-    ft:{bg:"rgba(16,185,129,.12)",color:"#10b981",label:"Final"},
-    live:{bg:"rgba(239,68,68,.15)",color:"#ef4444",label:"En Vivo"},
-    upcoming:{bg:"rgba(100,116,139,.12)",color:"#94a3b8",label:"Próximo"},
+    ft:{bg:"rgba(16,185,129,.12)",color:"#10b981",label:t.statusFt},
+    live:{bg:"rgba(239,68,68,.15)",color:"#ef4444",label:t.statusLive},
+    upcoming:{bg:"rgba(100,116,139,.12)",color:"#94a3b8",label:t.statusUpcoming},
   }[status]||{bg:"rgba(100,116,139,.12)",color:"#94a3b8",label:status};
   return <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:20,background:cfg.bg,color:cfg.color,letterSpacing:.5,textTransform:"uppercase",whiteSpace:"nowrap"}}>{cfg.label}</span>;
 }
@@ -212,6 +403,7 @@ function EstadoBadge({status}) {
 //  GAME CARD (left list)
 // ─────────────────────────────────────────────
 function GameCard({match:m, selected, onClick}) {
+  const t=_t;
   const ht=team(m.home), at=team(m.away);
   const isSel = selected?.id===m.id;
   return (
@@ -252,6 +444,7 @@ function GameCard({match:m, selected, onClick}) {
 //  MATCH DETAIL PANEL (right side)
 // ─────────────────────────────────────────────
 function MatchDetail({match:m, onEdit}) {
+  const t=_t;
   if(!m) return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100%",color:"#475569",fontSize:14,padding:40,textAlign:"center"}}>
       Selecciona un partido de la lista para ver detalles, eventos y estadísticas.
@@ -301,7 +494,7 @@ function MatchDetail({match:m, onEdit}) {
       <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:24}}>
         <InfoPill icon="📅" text={`${m.date} · ${m.time}`}/>
         <InfoPill icon="🏟️" text={m.venue}/>
-        {m.potm && <InfoPill icon="⭐" text={`Jugador del partido: ${m.potm}`} accent/>}
+        {m.potm && <InfoPill icon="⭐" text={`${t.potmLabel} ${m.potm}`} accent/>}
       </div>
 
       {/* Edit button */}
@@ -309,7 +502,7 @@ function MatchDetail({match:m, onEdit}) {
         padding:"8px 18px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",cursor:"pointer",
         background:"rgba(255,255,255,.04)",color:"#94a3b8",fontSize:12,fontWeight:600,fontFamily:ff,
         marginBottom:24,transition:"all .15s",
-      }}>✏️ Editar datos del partido</button>
+      }}>{`✏️ ${t.editMatch}`}</button>
 
       {/* Two columns: Events + Stats */}
       <div style={{display:"grid",gridTemplateColumns: m.stats?"1fr 1fr":"1fr",gap:20}}>
@@ -319,7 +512,7 @@ function MatchDetail({match:m, onEdit}) {
             ⚽ Eventos del Partido
           </div>
           {(m.events||[]).length===0 ? (
-            <div style={{fontSize:12,color:"#475569"}}>Sin eventos registrados aún.</div>
+            <div style={{fontSize:12,color:"#475569"}}>{t.noEvents}</div>
           ) : (
             <div>{(m.events||[]).map((e,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
@@ -341,10 +534,10 @@ function MatchDetail({match:m, onEdit}) {
             </div>
             <PossessionBar home={m.stats.possession[0]} away={m.stats.possession[1]}/>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:12}}>
-              <StatBox label="Tiros" homeVal={m.stats.shots[0]} awayVal={m.stats.shots[1]} homeName={m.home} awayName={m.away}/>
-              <StatBox label="Tiros a Puerta" homeVal={m.stats.shotsOnTarget[0]} awayVal={m.stats.shotsOnTarget[1]} homeName={m.home} awayName={m.away}/>
-              <StatBox label="Esquinas" homeVal={m.stats.corners[0]} awayVal={m.stats.corners[1]} homeName={m.home} awayName={m.away}/>
-              <StatBox label="Faltas" homeVal={m.stats.fouls[0]} awayVal={m.stats.fouls[1]} homeName={m.home} awayName={m.away}/>
+              <StatBox label={t.shots} homeVal={m.stats.shots[0]} awayVal={m.stats.shots[1]} homeName={m.home} awayName={m.away}/>
+              <StatBox label={t.shotsOnTarget} homeVal={m.stats.shotsOnTarget[0]} awayVal={m.stats.shotsOnTarget[1]} homeName={m.home} awayName={m.away}/>
+              <StatBox label={t.corners} homeVal={m.stats.corners[0]} awayVal={m.stats.corners[1]} homeName={m.home} awayName={m.away}/>
+              <StatBox label={t.fouls} homeVal={m.stats.fouls[0]} awayVal={m.stats.fouls[1]} homeName={m.home} awayName={m.away}/>
             </div>
           </div>
         )}
@@ -361,10 +554,11 @@ function InfoPill({icon,text,accent}) {
 }
 
 function PossessionBar({home,away}) {
+  const t=_t;
   return (
     <div style={{marginBottom:4}}>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"#94a3b8",marginBottom:6,fontWeight:600}}>
-        <span>Posesión</span><span>{home}% / {away}%</span>
+        <span>{t.possession}</span><span>{home}% / {away}%</span>
       </div>
       <div style={{display:"flex",height:8,borderRadius:4,overflow:"hidden",background:"rgba(255,255,255,.06)"}}>
         <div style={{width:`${home}%`,background:"linear-gradient(90deg,#06b6d4,#3b82f6)",borderRadius:"4px 0 0 4px",transition:"width .5s"}}/>
@@ -375,6 +569,7 @@ function PossessionBar({home,away}) {
 }
 
 function StatBox({label,homeVal,awayVal,homeName,awayName}) {
+  const t=_t;
   return (
     <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.05)",borderRadius:12,padding:"12px 10px",textAlign:"center"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
@@ -392,6 +587,7 @@ function StatBox({label,homeVal,awayVal,homeName,awayName}) {
 //  EDIT MODAL
 // ─────────────────────────────────────────────
 function EditModal({match:m, onSave, onClose}) {
+  const t=_t;
   const [data, setData] = useState({
     status: m.status,
     homeScore: m.homeScore!=null ? String(m.homeScore) : "",
@@ -434,7 +630,7 @@ function EditModal({match:m, onSave, onClose}) {
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.7)",backdropFilter:"blur(6px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={onClose}>
       <div style={{background:"linear-gradient(160deg,#0f172a,#1e293b)",border:"1px solid rgba(255,255,255,.1)",borderRadius:20,maxWidth:560,width:"100%",maxHeight:"90vh",overflow:"auto",padding:"24px 20px"}} onClick={e=>e.stopPropagation()}>
         <div style={{display:"flex",justifyContent:"space-between",marginBottom:20}}>
-          <div style={{fontFamily:fb,fontSize:20,letterSpacing:3,color:"#06b6d4"}}>EDITAR PARTIDO</div>
+          <div style={{fontFamily:fb,fontSize:20,letterSpacing:3,color:"#06b6d4"}}>{t.editTitle}</div>
           <button onClick={onClose} style={{background:"none",border:"none",color:"#64748b",fontSize:20,cursor:"pointer"}}>×</button>
         </div>
         <div style={{fontWeight:600,fontSize:14,marginBottom:16,color:"#e2e8f0"}}>{m.home} vs {m.away}</div>
@@ -462,8 +658,8 @@ function EditModal({match:m, onSave, onClose}) {
         </div>
 
         <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
-          <button onClick={onClose} style={{padding:"10px 20px",borderRadius:10,border:"none",cursor:"pointer",background:"rgba(255,255,255,.06)",color:"#94a3b8",fontFamily:ff,fontSize:13,fontWeight:600}}>Cancelar</button>
-          <button onClick={save} style={{padding:"10px 24px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#06b6d4,#7c3aed)",color:"#fff",fontFamily:ff,fontSize:13,fontWeight:600}}>Guardar</button>
+          <button onClick={onClose} style={{padding:"10px 20px",borderRadius:10,border:"none",cursor:"pointer",background:"rgba(255,255,255,.06)",color:"#94a3b8",fontFamily:ff,fontSize:13,fontWeight:600}}>{t.cancel}</button>
+          <button onClick={save} style={{padding:"10px 24px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#06b6d4,#7c3aed)",color:"#fff",fontFamily:ff,fontSize:13,fontWeight:600}}>{t.save}</button>
         </div>
       </div>
     </div>
@@ -474,6 +670,7 @@ function EditModal({match:m, onSave, onClose}) {
 //  PAGE 1: HOME / TODAY
 // ─────────────────────────────────────────────
 function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSelectedMatch, onEdit}) {
+  const t=_t;
   const dayMatches = useMemo(()=> fixtures.filter(f=>f.date===selectedDate), [fixtures,selectedDate]);
   const jugados = dayMatches.filter(f=>f.status==="ft");
   const live = dayMatches.filter(f=>f.status==="live");
@@ -496,29 +693,29 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
         </div>
 
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
-          <span style={{fontFamily:fb,fontSize:20,letterSpacing:2,color:"#e2e8f0"}}>PARTIDOS DEL DÍA</span>
+          <span style={{fontFamily:fb,fontSize:20,letterSpacing:2,color:"#e2e8f0"}}>{t.todayGames}</span>
           <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:20,
             background: live.length>0?"rgba(239,68,68,.12)":"rgba(16,185,129,.1)",
             color: live.length>0?"#ef4444":"#10b981",
-          }}>{live.length>0?`${live.length} EN VIVO`:"Listo"}</span>
+          }}>{live.length>0?`${live.length} ${t.statusLive}`:t.liveReady}</span>
         </div>
         <p style={{fontSize:11,color:"#64748b",marginBottom:16,lineHeight:1.5}}>
           Partidos agrupados por día con marcadores y estado. Haz clic en un partido para ver detalles.
         </p>
 
         {live.length>0 && <>
-          <div style={{fontSize:10,fontWeight:700,color:"#ef4444",letterSpacing:1.5,marginBottom:8}}>EN VIVO</div>
+          <div style={{fontSize:10,fontWeight:700,color:"#ef4444",letterSpacing:1.5,marginBottom:8}}>{t.liveNow}</div>
           {live.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
         {jugados.length>0 && <>
-          <div style={{fontSize:10,fontWeight:700,color:"#10b981",letterSpacing:1.5,marginBottom:8,marginTop:live.length?16:0}}>FINALIZADOS</div>
+          <div style={{fontSize:10,fontWeight:700,color:"#10b981",letterSpacing:1.5,marginBottom:8,marginTop:live.length?16:0}}>{t.completed}</div>
           {jugados.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
         {upcoming.length>0 && <>
-          <div style={{fontSize:10,fontWeight:700,color:"#94a3b8",letterSpacing:1.5,marginBottom:8,marginTop:(jugados.length||live.length)?16:0}}>PRÓXIMOS</div>
+          <div style={{fontSize:10,fontWeight:700,color:"#94a3b8",letterSpacing:1.5,marginBottom:8,marginTop:(jugados.length||live.length)?16:0}}>{t.comingNext}</div>
           {upcoming.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
-        {dayMatches.length===0 && <div style={{color:"#475569",fontSize:13,padding:20}}>No hay partidos programados para esta fecha.</div>}
+        {dayMatches.length===0 && <div style={{color:"#475569",fontSize:13,padding:20}}>{t.noMatches}</div>}
       </div>
 
       {/* RIGHT: Match detail */}
@@ -533,11 +730,12 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
 //  PAGE 2: FIXTURES
 // ─────────────────────────────────────────────
 function FixturesPage({fixtures, onSelect}) {
+  const t=_t;
   const [gf, setGf] = useState("ALL");
   const list = gf==="ALL" ? fixtures : fixtures.filter(f=>f.group===gf);
   return (<div style={{padding:"20px 0"}}>
     <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:20}}>
-      <button style={fbtn(gf==="ALL")} onClick={()=>setGf("ALL")}>Todos</button>
+      <button style={fbtn(gf==="ALL")} onClick={()=>setGf("ALL")}>{t.all}</button>
       {Object.keys(GROUPS).map(g=><button key={g} style={fbtn(gf===g)} onClick={()=>setGf(g)}>{g}</button>)}
     </div>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(340px,1fr))",gap:20}}>
@@ -548,7 +746,7 @@ function FixturesPage({fixtures, onSelect}) {
           <div style={{padding:"10px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",
             background:`linear-gradient(90deg,${GC[g]||"#06b6d4"}15,transparent)`,borderBottom:`1px solid ${GC[g]||"#06b6d4"}30`}}>
             <span style={{fontFamily:fb,fontSize:20,letterSpacing:3,color:GC[g]||"#06b6d4"}}>GROUP {g}</span>
-            <span style={{fontSize:10,color:"#64748b"}}>{gMatches.filter(f=>f.status==="ft").length}/6 jugados</span>
+            <span style={{fontSize:10,color:"#64748b"}}>{gMatches.filter(f=>f.status==="ft").length}/6 {t.played}</span>
           </div>
           {/* Standings mini */}
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
@@ -591,6 +789,7 @@ function fbtn(a){return{padding:"6px 14px",borderRadius:8,border:"1px solid rgba
 //  PAGE 3: STATISTICS
 // ─────────────────────────────────────────────
 function StatsPage({fixtures}) {
+  const t=_t;
   const [selTeam, setSelTeam] = useState(null);
   const [statsView, setStatsView] = useState("tournament"); // tournament | team
   const done = fixtures.filter(f=>f.status==="ft"||f.status==="live");
@@ -680,7 +879,7 @@ function StatsPage({fixtures}) {
         padding:"8px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,.08)",cursor:"pointer",
         background:"rgba(255,255,255,.03)",color:"#94a3b8",fontSize:12,fontWeight:600,fontFamily:ff,
         marginBottom:20,display:"flex",alignItems:"center",gap:6,
-      }}>← Volver a Estadísticas del Torneo</button>
+      }}>{t.backToTournament}</button>
 
       {/* Team header */}
       <div style={{display:"flex",alignItems:"center",gap:20,marginBottom:24,flexWrap:"wrap"}}>
@@ -712,9 +911,9 @@ function StatsPage({fixtures}) {
       {/* Key numbers */}
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:8,marginBottom:24}}>
         {[
-          {v:mp,l:"PJ",c:"#06b6d4"},{v:w,l:"G",c:"#10b981"},{v:d,l:"E",c:"#f59e0b"},{v:l,l:"P",c:"#ef4444"},
-          {v:ts.gf,l:"GF",c:"#7c3aed"},{v:ts.ga,l:"GC",c:"#f43f5e"},{v:ts.gf-ts.ga,l:"DG",c:ts.gf-ts.ga>0?"#10b981":ts.gf-ts.ga<0?"#ef4444":"#64748b"},
-          {v:pts,l:"Pts",c:"#fff"},{v:avgPoss+"%",l:"Pos. Prom.",c:"#3b82f6"},{v:ts.cleanSheets,l:"Valla Inv.",c:"#14b8a6"},
+          {v:mp,l:t.pj,c:"#06b6d4"},{v:w,l:"G",c:"#10b981"},{v:d,l:"E",c:"#f59e0b"},{v:l,l:"P",c:"#ef4444"},
+          {v:ts.gf,l:t.gf,c:"#7c3aed"},{v:ts.ga,l:t.gc,c:"#f43f5e"},{v:ts.gf-ts.ga,l:t.dg,c:ts.gf-ts.ga>0?"#10b981":ts.gf-ts.ga<0?"#ef4444":"#64748b"},
+          {v:pts,l:t.pts,c:"#fff"},{v:avgPoss+"%",l:t.avgPoss,c:"#3b82f6"},{v:ts.cleanSheets,l:t.cleanSheet,c:"#14b8a6"},
         ].map(x=>(
           <div key={x.l} style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
             <div style={{fontFamily:fb,fontSize:24,color:x.c}}>{x.v}</div>
@@ -726,8 +925,8 @@ function StatsPage({fixtures}) {
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
         {/* Match results */}
         <div style={card()}>
-          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>RESULTADOS</div>
-          {ts.matches.length===0?<div style={{color:"#475569",fontSize:12}}>Sin partidos jugados aún.</div>:
+          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.matchResults}</div>
+          {ts.matches.length===0?<div style={{color:"#475569",fontSize:12}}>{t.noMatchesYet}</div>:
           ts.matches.map((m,i)=>{
             const opp = team(m.opponent);
             return (<div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
@@ -748,7 +947,7 @@ function StatsPage({fixtures}) {
 
         {/* Team goalscorers */}
         <div style={card()}>
-          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>GOLEADORES DEL EQUIPO</div>
+          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.teamScorers}</div>
           {teamGoals.length===0?<div style={{color:"#475569",fontSize:12}}>No goals scored yet.</div>:
           teamGoals.map((g,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
@@ -760,7 +959,7 @@ function StatsPage({fixtures}) {
             </div>
           ))}
 
-          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12,marginTop:24}}>DISCIPLINA</div>
+          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12,marginTop:24}}>{t.discipline}</div>
           <div style={{display:"flex",gap:16}}>
             <div style={{display:"flex",alignItems:"center",gap:6}}>
               <div style={{width:14,height:18,borderRadius:2,background:"#eab308"}}/> 
@@ -778,7 +977,7 @@ function StatsPage({fixtures}) {
 
       {/* Performance bars */}
       <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>MÉTRICAS DE RENDIMIENTO</div>
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>{t.perfMetrics}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
           <StatBar label="Goles Anotados" value={ts.gf} max={maxGoals} color="#10b981"/>
           <StatBar label="Goles Recibidos" value={ts.ga} max={maxGoals} color="#ef4444"/>
@@ -791,7 +990,7 @@ function StatsPage({fixtures}) {
 
       {/* Match-by-match stats breakdown */}
       {ts.matches.some(m=>m.stats)&&<div style={{...card(),marginTop:20}}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>ESTADÍSTICAS POR PARTIDO</div>
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>{t.matchByMatch}</div>
         <div style={{overflowX:"auto"}}>
           <table style={{width:"100%",borderCollapse:"collapse",fontSize:12,minWidth:500}}>
             <thead><tr>{["Rival","Resultado","Pos","Tiros","TAP","Esq","Faltas"].map(h=>
@@ -822,7 +1021,7 @@ function StatsPage({fixtures}) {
   return (<div style={{padding:"20px 0"}}>
     {/* Team selector */}
     <div style={{marginBottom:24}}>
-      <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#94a3b8",marginBottom:12}}>SELECCIONA UN EQUIPO PARA ESTADÍSTICAS DETALLADAS</div>
+      <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#94a3b8",marginBottom:12}}>{t.selectTeam}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:6}}>
         {ALL_TEAMS.map(t=>{
           const hasData = !!teamStats[t.name];
@@ -857,8 +1056,8 @@ function StatsPage({fixtures}) {
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}}>
       {/* Top scorers */}
       <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>GOLEADORES</div>
-        {topScorers.length===0?<div style={{color:"#475569",fontSize:12}}>Sin goles aún.</div>:
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.topScorers}</div>
+        {topScorers.length===0?<div style={{color:"#475569",fontSize:12}}>{t.noGoals}</div>:
         topScorers.map((s,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.04)",cursor:"pointer"}}
             onClick={()=>selectTeam(s.team)}>
@@ -876,8 +1075,8 @@ function StatsPage({fixtures}) {
 
       {/* POTM */}
       <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>PREMIOS JUGADOR DEL PARTIDO</div>
-        {topPotm.length===0?<div style={{color:"#475569",fontSize:12}}>Sin premios aún.</div>:
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.potmAwards}</div>
+        {topPotm.length===0?<div style={{color:"#475569",fontSize:12}}>{t.noAwards}</div>:
         topPotm.map(([n,c],i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.04)"}}>
             <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{color:"#f59e0b"}}>⭐</span><span style={{fontSize:13,fontWeight:500}}>{n}</span></div>
@@ -887,8 +1086,8 @@ function StatsPage({fixtures}) {
 
       {/* Top attacking teams */}
       <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>EQUIPOS MÁS OFENSIVOS</div>
-        {topAttack.length===0?<div style={{color:"#475569",fontSize:12}}>Sin datos aún.</div>:
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.topAttacking}</div>
+        {topAttack.length===0?<div style={{color:"#475569",fontSize:12}}>{t.noData}</div>:
         topAttack.map((t,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid rgba(255,255,255,.04)",cursor:"pointer"}}
             onClick={()=>selectTeam(t.name)}>
@@ -904,7 +1103,7 @@ function StatsPage({fixtures}) {
 
       {/* Group leaders */}
       <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>LÍDERES DE GRUPO</div>
+        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:12}}>{t.groupLeaders}</div>
         {Object.keys(GROUPS).map(g=>{
           const st=calcStandings(g,fixtures);
           const leader=st[0];
@@ -960,6 +1159,7 @@ function calcPts(player, fixtures) {
 }
 
 function PredictionsPage({fixtures,uploaded,setUploaded}) {
+  const t=_t;
   const [sel,setSel]=useState(null);
   const [filter,setFilter]=useState("all");
   const [showDemo,setShowDemo]=useState(true);
@@ -998,15 +1198,15 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     return(<div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:16,overflow:"hidden"}}>
       <div style={{padding:"14px 18px",background:accent,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
         <span style={{fontFamily:fb,fontSize:20,letterSpacing:2,color:"#fff"}}>{label}</span>
-        <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600}}>{players.length} jugadores</span>
+        <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600}}>{players.length} {t.players}</span>
       </div>
       <table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr>
-        {["Pos","Nombre","Resultado","Exacto","Grupo","Total"].map(h=><th key={h} style={{padding:"10px 8px",textAlign:h==="Nombre"?"left":"center",fontSize:12,fontWeight:700,color:"#64748b",borderBottom:"1px solid rgba(255,255,255,.06)"}}>{h}</th>)}
+        {[t.pos,t.name,t.resultsCol,t.exactCol,t.groupCol,t.totalCol].map(h=><th key={h} style={{padding:"10px 8px",textAlign:h==="Nombre"?"left":"center",fontSize:12,fontWeight:700,color:"#64748b",borderBottom:"1px solid rgba(255,255,255,.06)"}}>{h}</th>)}
       </tr></thead><tbody>{ranked.map((p,i)=>(
         <tr key={p.name} onClick={()=>setSel(p)} style={{cursor:"pointer",borderBottom:"1px solid rgba(255,255,255,.04)"}}
           onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.03)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
           <td style={{padding:"10px 8px",textAlign:"center"}}><span style={{width:24,height:24,borderRadius:7,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,background:i===0?"rgba(245,158,11,.15)":i<3?"rgba(16,185,129,.12)":"rgba(255,255,255,.05)",color:i===0?"#f59e0b":i<3?"#10b981":"#64748b"}}>{i+1}</span></td>
-          <td style={{padding:"10px 8px",fontWeight:600,fontSize:14,color:"#e2e8f0"}}>{p.name}{p.uploaded&&<span style={{marginLeft:6,fontSize:10,color:"#06b6d4"}}>(importado)</span>}</td>
+          <td style={{padding:"10px 8px",fontWeight:600,fontSize:14,color:"#e2e8f0"}}>{p.name}{p.uploaded&&<span style={{marginLeft:6,fontSize:10,color:"#06b6d4"}}>(t.imported)</span>}</td>
           <td style={{padding:"10px 8px",textAlign:"center",fontSize:13,color:"#94a3b8"}}>{p.pts.rPts}</td>
           <td style={{padding:"10px 8px",textAlign:"center",fontSize:13,color:"#94a3b8"}}>{p.pts.ePts}</td>
           <td style={{padding:"10px 8px",textAlign:"center",fontSize:13,color:"#94a3b8"}}>{p.pts.gPts}</td>
@@ -1019,24 +1219,24 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     const pts=calcPts(sel,fixtures);
     const done=fixtures.filter(f=>f.status==="ft"||f.status==="live");
     return(<div style={{padding:"20px 0"}}>
-      <button onClick={()=>setSel(null)} style={{padding:"8px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,.08)",cursor:"pointer",background:"rgba(255,255,255,.03)",color:"#94a3b8",fontSize:12,fontWeight:600,fontFamily:ff,marginBottom:20}}>← Volver</button>
+      <button onClick={()=>setSel(null)} style={{padding:"8px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,.08)",cursor:"pointer",background:"rgba(255,255,255,.03)",color:"#94a3b8",fontSize:12,fontWeight:600,fontFamily:ff,marginBottom:20}}>{t.back}</button>
       <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:16,padding:24,marginBottom:20}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>
           <div><div style={{fontFamily:fb,fontSize:32,letterSpacing:2,color:"#fff"}}>{sel.name}</div>
-            <span style={{fontSize:12,fontWeight:700,padding:"3px 12px",borderRadius:20,background:sel.group==="friends"?"rgba(6,182,212,.12)":"rgba(244,63,94,.12)",color:sel.group==="friends"?"#06b6d4":"#f43f5e",marginTop:6,display:"inline-block"}}>{sel.group==="friends"?"Amigos":"Familia"}</span></div>
+            <span style={{fontSize:12,fontWeight:700,padding:"3px 12px",borderRadius:20,background:sel.group==="friends"?"rgba(6,182,212,.12)":"rgba(244,63,94,.12)",color:sel.group==="friends"?"#06b6d4":"#f43f5e",marginTop:6,display:"inline-block"}}>{sel.group==="friends"?t.friends.charAt(0).toUpperCase()+t.friends.slice(1).toLowerCase():t.family.charAt(0).toUpperCase()+t.family.slice(1).toLowerCase()}</span></div>
           <div style={{textAlign:"center"}}><div style={{fontFamily:fb,fontSize:48,color:"#f59e0b"}}>{pts.total}</div><div style={{fontSize:12,fontWeight:700,color:"#64748b"}}>PUNTOS</div></div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginTop:20}}>
-          {[{v:pts.rCount,l:"Resultados",s:`${pts.rPts} pts`,c:"#06b6d4"},{v:pts.eCount,l:"Exactos",s:`${pts.ePts} pts`,c:"#10b981"},{v:Object.keys(sel.groupWinners||{}).length,l:"Grupos",s:`${pts.gPts} pts`,c:"#7c3aed"},{v:"—",l:"Bonos",s:"0 pts",c:"#f59e0b"}].map(x=>(<div key={x.l} style={{background:"rgba(255,255,255,.03)",borderRadius:12,padding:"12px 10px",textAlign:"center",border:"1px solid rgba(255,255,255,.04)"}}>
+          {[{v:pts.rCount,l:t.resultados,s:`${pts.rPts} pts`,c:"#06b6d4"},{v:pts.eCount,l:t.exactos,s:`${pts.ePts} pts`,c:"#10b981"},{v:Object.keys(sel.groupWinners||{}).length,l:t.grupos,s:`${pts.gPts} pts`,c:"#7c3aed"},{v:"—",l:t.bonos,s:"0 pts",c:"#f59e0b"}].map(x=>(<div key={x.l} style={{background:"rgba(255,255,255,.03)",borderRadius:12,padding:"12px 10px",textAlign:"center",border:"1px solid rgba(255,255,255,.04)"}}>
             <div style={{fontFamily:fb,fontSize:22,color:x.c}}>{x.v}</div><div style={{fontSize:12,color:"#64748b"}}>{x.l}</div><div style={{fontSize:12,fontWeight:700,color:x.c,marginTop:2}}>{x.s}</div></div>))}
         </div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
         <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:16,padding:20}}>
-          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>PICKS PRE-TORNEO</div>
+          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>{t.preTournament}</div>
           {[{l:"Campeón",v:sel.champion},{l:"Bota de Oro",v:sel.goldenBoot}].map(x=>(<div key={x.l} style={{padding:"10px 14px",background:"rgba(255,255,255,.02)",borderRadius:10,marginBottom:8}}>
             <div style={{fontSize:12,color:"#64748b",fontWeight:600}}>{x.l}</div><div style={{fontSize:16,fontWeight:700,color:"#e2e8f0",marginTop:2}}>{x.v||"—"}</div></div>))}
-          <div style={{fontFamily:fb,fontSize:16,letterSpacing:2,color:"#06b6d4",marginTop:20,marginBottom:12}}>GANADORES DE GRUPO</div>
+          <div style={{fontFamily:fb,fontSize:16,letterSpacing:2,color:"#06b6d4",marginTop:20,marginBottom:12}}>{t.groupWinners}</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
             {Object.entries(sel.groupWinners||{}).map(([g,pick])=>{
               const st=calcStandings(g,fixtures);const actual=st.length>0&&st[0].mp>0?st[0].name:null;const ok=actual&&actual===pick;
@@ -1046,7 +1246,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
           </div>
         </div>
         <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:16,padding:20}}>
-          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>POLLA MUNDIALISTA</div>
+          <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#06b6d4",marginBottom:16}}>{t.pollaTitle}</div>
           {done.length===0?<div style={{color:"#64748b",fontSize:13}}>Sin partidos jugados aún.</div>:done.map(f=>{
             const p=sel.matches?.[f.id];if(!p)return null;
             const aR=(f.homeScore||0)>(f.awayScore||0)?"W":(f.homeScore||0)<(f.awayScore||0)?"L":"D";
@@ -1066,13 +1266,13 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
   return(<div style={{padding:"20px 0"}}>
     <div style={{fontFamily:fb,fontSize:24,letterSpacing:2,color:"#06b6d4",marginBottom:4}}>POLLA MUNDIALISTA</div>
-    <div style={{fontSize:13,color:"#64748b",marginBottom:16}}>V/E/D correcto = 3 pts · Marcador exacto = +5 pts · Ganador grupo = 5 pts · Campeón = 15 pts · Bota de Oro = 10 pts</div>
+    <div style={{fontSize:13,color:"#64748b",marginBottom:16}}>{t.pollaDesc}</div>
     {/* Import panel */}
     <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:"16px 20px",marginBottom:20}}>
       <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}>
         <div style={{flex:1,minWidth:200}}>
-          <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>Importar jugadores</div>
-          <div style={{fontSize:12,color:"#64748b"}}>Pega datos JSON de los participantes. Usa el convertidor de Excel para generar el JSON desde los archivos .xlsx</div>
+          <div style={{fontSize:14,fontWeight:700,color:"#e2e8f0",marginBottom:4}}>{t.importPlayers}</div>
+          <div style={{fontSize:12,color:"#64748b"}}>{t.importDesc}</div>
         </div>
         <button onClick={()=>setShowImport(!showImport)} style={{padding:"8px 18px",borderRadius:10,border:"none",cursor:"pointer",background:"linear-gradient(135deg,#06b6d4,#7c3aed)",color:"#fff",fontSize:12,fontWeight:600,fontFamily:ff}}>
           {showImport?"Cerrar":"📋 Importar JSON"}
@@ -1082,7 +1282,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
       {showImport&&<div style={{marginTop:12}}>
         <textarea value={jsonText} onChange={e=>setJsonText(e.target.value)} rows={6} placeholder={'[\n  {"name":"Juan","group":"friends","champion":"Argentina","goldenBoot":"Mbappé",\n   "groupWinners":{"A":"Mexico","B":"Canada",...},\n   "matches":{"0":{"r":"W","h":2,"a":1},...}}\n]'} style={{width:"100%",padding:"10px 14px",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:10,color:"#e2e8f0",fontSize:12,fontFamily:"monospace",outline:"none",boxSizing:"border-box",resize:"vertical"}}/>
         <div style={{display:"flex",gap:8,marginTop:8}}>
-          <button onClick={doImport} style={{padding:"8px 16px",borderRadius:8,border:"none",cursor:"pointer",background:"#10b981",color:"#fff",fontSize:12,fontWeight:600,fontFamily:ff}}>Importar</button>
+          <button onClick={doImport} style={{padding:"8px 16px",borderRadius:8,border:"none",cursor:"pointer",background:"#10b981",color:"#fff",fontSize:12,fontWeight:600,fontFamily:ff}}>{t.importGo}</button>
           {importMsg&&<span style={{fontSize:12,fontWeight:600,color:importMsg.ok?"#10b981":"#ef4444",alignSelf:"center"}}>{importMsg.msg}</span>}
         </div>
       </div>}
@@ -1092,17 +1292,18 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
       {[{id:"all",l:"Todos"},{id:"friends",l:"Amigos"},{id:"family",l:"Familia"}].map(f=>(
         <button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:8,border:"1px solid rgba(255,255,255,.08)",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:ff,background:filter===f.id?"rgba(6,182,212,.15)":"transparent",color:filter===f.id?"#06b6d4":"#64748b"}}>{f.l}</button>))}
       <label style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:12,color:"#64748b"}}>
-        <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> Datos demo</label>
+        <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> {t.showDemo}</label>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:24}}>
       {(filter==="all"||filter==="friends")&&board(fri,"AMIGOS","#06b6d4")}
       {(filter==="all"||filter==="family")&&board(fam,"FAMILIA","#f43f5e")}
-      {fri.length===0&&fam.length===0&&<div style={{textAlign:"center",padding:40,color:"#64748b"}}>Sin jugadores. Importa datos o activa el demo.</div>}
+      {fri.length===0&&fam.length===0&&<div style={{textAlign:"center",padding:40,color:"#64748b"}}>{t.noPlayers}</div>}
     </div>
   </div>);
 }
 
 function FetchPanel({fixtures, onUpdate}) {
+  const t=_t;
   const [apiKey, setApiKey] = useState("");
   const [status, setStatus] = useState(null); // {ok:bool, msg:string}
   const [loading, setLoading] = useState(false);
@@ -1252,7 +1453,7 @@ function FetchPanel({fixtures, onUpdate}) {
           padding:"7px 16px",borderRadius:8,border:"none",cursor:loading?"default":"pointer",
           background:loading?"rgba(255,255,255,.04)":"linear-gradient(135deg,#06b6d4,#7c3aed)",
           color:"#fff",fontSize:11,fontWeight:600,fontFamily:ff,opacity:loading?.6:1,whiteSpace:"nowrap",
-        }}>{loading?"Cargando...":"Obtener Marcadores"}</button>
+        }}>{loading?"Cargando...":t.fetchScores}</button>
         <button onClick={fetchDetails} disabled={detailsLoading} style={{
           padding:"7px 16px",borderRadius:8,border:"1px solid rgba(255,255,255,.1)",cursor:detailsLoading?"default":"pointer",
           background:"rgba(255,255,255,.04)",color:"#e2e8f0",fontSize:11,fontWeight:600,fontFamily:ff,
@@ -1272,6 +1473,9 @@ function FetchPanel({fixtures, onUpdate}) {
 //  MAIN APP
 // ─────────────────────────────────────────────
 export default function App() {
+  const [lang, setLang] = useState("es");
+  const t=LANG[lang]||LANG.es;
+  _t=t;
   const [fixtures, setFixtures] = useState(initFixtures);
   const [page, setPage] = useState("home");
   const [selectedDate, setSelectedDate] = useState("Jun 11");
@@ -1331,26 +1535,27 @@ export default function App() {
   return (
     <div style={{fontFamily:ff,background:"linear-gradient(145deg,#050816 0%,#0c1229 40%,#111b3a 100%)",minHeight:"100vh",color:"#e2e8f0"}}>
       {/* ─── HEADER ─── */}
-      <div style={{background:"linear-gradient(135deg,rgba(6,182,212,.08),rgba(124,58,237,.08),rgba(244,63,94,.06))",borderBottom:"1px solid rgba(255,255,255,.06)",padding:"20px 24px 16px"}}>
+      <div style={{background:"linear-gradient(135deg,rgba(6,182,212,.08),rgba(124,58,237,.08),rgba(244,63,94,.06))",borderBottom:"1px solid rgba(255,255,255,.06)",padding:"20px 24px 16px",position:"relative"}}>
         <div style={{maxWidth:1280,margin:"0 auto"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16,marginBottom:16}}>
             <div>
               <div style={{fontSize:10,fontWeight:700,color:"#06b6d4",letterSpacing:2,textTransform:"uppercase",marginBottom:4,display:"flex",alignItems:"center",gap:6}}>
-                <span style={{width:8,height:8,borderRadius:4,background:"#06b6d4"}}/>Mundial 2026 de Papo
+                <span style={{width:8,height:8,borderRadius:4,background:"#06b6d4"}}/>{t.brandSub}
               </div>
               <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,lineHeight:1.1,
                 background:"linear-gradient(90deg,#fff 0%,#94a3b8 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
-                Centro de Mando del Mundial 2026 de Papo
+                {t.brandTitle}
               </div>
               <div style={{fontSize:12,color:"#64748b",marginTop:4,maxWidth:480}}>
-                Cuatro vistas conectadas: Partidos del Día, Mapa de Partidos, Centro de Estadísticas y Polla Mundialista. Listo para datos manuales y API en vivo.
+                {t.brandDesc}
               </div>
               <div style={{marginTop:8,fontSize:11,fontWeight:600,color:"#94a3b8"}}>
-                Modo de datos: <span style={{color:apiConnected?"#10b981":demoMode?"#06b6d4":"#f59e0b"}}>{apiConnected?"API en Vivo Conectada":demoMode?"Modo Demo Activo":"Modo Manual"}</span>
+                {t.dataMode} <span style={{color:apiConnected?"#10b981":demoMode?"#06b6d4":"#f59e0b"}}>{apiConnected?t.apiLive:demoMode?t.demoActive:t.manualMode}</span>
               </div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
-              {[{v:"104",l:"PARTIDOS"},{v:"48",l:"EQUIPOS"},{v:"16",l:"CIUDADES"},{v:"4",l:"VISTAS"}].map(x=>(
+              <button onClick={()=>setLang(l=>l==="es"?"en":"es")} style={{position:"absolute",top:12,right:12,padding:"6px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(255,255,255,.1)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:ff,letterSpacing:1,zIndex:10}}>{lang==="es"?"EN 🇺🇸":"ES 🇪🇸"}</button>
+              {[{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities},{v:"4",l:t.views}].map(x=>(
                 <div key={x.l} style={{background:"rgba(6,182,212,.08)",border:"1px solid rgba(6,182,212,.15)",borderRadius:12,padding:"10px 14px",textAlign:"center",minWidth:72}}>
                   <div style={{fontFamily:fb,fontSize:28,color:"#fff",letterSpacing:1}}>{x.v}</div>
                   <div style={{fontSize:9,color:"#06b6d4",fontWeight:700,letterSpacing:1}}>{x.l}</div>
@@ -1362,15 +1567,15 @@ export default function App() {
           {/* Action buttons */}
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
             <button onClick={simulateDemo} style={{padding:"8px 18px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",cursor:"pointer",background:"rgba(255,255,255,.04)",color:"#e2e8f0",fontSize:12,fontWeight:600,fontFamily:ff,display:"flex",alignItems:"center",gap:6}}>
-              ⚡ Simular datos de API
+              {`⚡ ${t.simulate}`}
             </button>
             <button onClick={resetData} style={{padding:"8px 18px",borderRadius:10,border:"1px solid rgba(255,255,255,.1)",cursor:"pointer",background:"rgba(255,255,255,.04)",color:"#94a3b8",fontSize:12,fontWeight:600,fontFamily:ff,display:"flex",alignItems:"center",gap:6}}>
-              🔄 Reiniciar datos
+              {`🔄 ${t.reset}`}
             </button>
             <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12,fontSize:11,color:"#64748b"}}>
-              <span>{totalPlayed} finalizados</span>
-              {totalLive>0&&<span style={{color:"#ef4444",fontWeight:700}}>{totalLive} en vivo</span>}
-              <span>{72-totalPlayed-totalLive} próximos</span>
+              <span>{totalPlayed} {t.finished}</span>
+              {totalLive>0&&<span style={{color:"#ef4444",fontWeight:700}}>{totalLive} {t.liveCount}</span>}
+              <span>{72-totalPlayed-totalLive} {t.upcomingCount}</span>
             </div>
           </div>
 
@@ -1379,7 +1584,7 @@ export default function App() {
 
           {/* Nav tabs */}
           <div style={{display:"flex",gap:4,background:"rgba(255,255,255,.04)",borderRadius:12,padding:4,width:"fit-content"}}>
-            {[{id:"home",icon:"🏠",label:"Inicio / Hoy"},{id:"fixtures",icon:"🏟️",label:"Partidos"},{id:"stats",icon:"📊",label:"Estadísticas"},{id:"predictions",icon:"🏆",label:"Polla Mundialista"}].map(t=>(
+            {[{id:"home",icon:"🏠",label:t.navHome},{id:"fixtures",icon:"🏟️",label:t.navFixtures},{id:"stats",icon:"📊",label:t.navStats},{id:"predictions",icon:"🏆",label:t.navPolla}].map(t=>(
               <button key={t.id} onClick={()=>setPage(t.id)} style={{
                 padding:"10px 22px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:600,
                 letterSpacing:.3,transition:"all .2s",display:"flex",alignItems:"center",gap:6,
