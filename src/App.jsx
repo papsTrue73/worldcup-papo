@@ -1177,7 +1177,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     if(!file) return;
     setImportMsg({ok:true, msg:`Leyendo ${file.name}...`});
     try {
-      const XLSX = await import("sheetjs");
+      const XLSX = await import("xlsx");
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, {type:"array"});
       const gLetters = ["A","B","C","D","E","F","G","H","I","J","K","L"];
