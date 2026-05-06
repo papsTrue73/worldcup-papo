@@ -26,7 +26,7 @@ const LANG = {
     matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
     finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
     // Nav
-    navHome: "Inicio / Hoy", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones AI", navPolla: "Polla Mundialista",
+    navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones", navPolla: "Polla",
     // Status
     statusFt: "Final", statusLive: "En Vivo", statusUpcoming: "Próximo",
     // Home
@@ -123,7 +123,7 @@ const LANG = {
     simulate: "Simulate API refresh", reset: "Reset data",
     matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
-    navHome: "Home / Today", navFixtures: "Fixture Map", navStats: "Statistics Center", navAI: "AI Predictions", navPolla: "Polla Mundialista",
+    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Polla",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
     todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
     todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
@@ -1976,10 +1976,10 @@ export default function App() {
           </div>
           {/* Row 2: Nav + Actions */}
           <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-            <div style={{display:"flex",gap:3,background:"rgba(255,255,255,.08)",borderRadius:10,padding:3,overflowX:"auto",WebkitOverflowScrolling:"touch",flex:mobile?1:"none"}}>
+            <div style={{display:"flex",gap:2,background:"rgba(255,255,255,.08)",borderRadius:8,padding:2,overflowX:"auto",WebkitOverflowScrolling:"touch",flex:mobile?1:"none"}}>
               {[{id:"home",label:t.navHome},{id:"fixtures",label:t.navFixtures},{id:"stats",label:t.navStats},{id:"ai",label:t.navAI},{id:"predictions",label:t.navPolla}].map(t=>(
                 <button key={t.id} onClick={()=>setPage(t.id)} style={{
-                  padding:mobile?"6px 10px":"7px 16px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:mobile?12:13,fontWeight:600,
+                  padding:mobile?"5px 8px":"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:mobile?12:13,fontWeight:600,
                   whiteSpace:"nowrap",transition:"all .15s",
                   background:page===t.id?"#D4A843":"transparent",
                   color:page===t.id?"#1B2A6B":"rgba(255,255,255,.7)",
