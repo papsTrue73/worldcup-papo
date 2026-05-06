@@ -14,8 +14,8 @@ if(ENV_SHEET_ID)ENV_SHEET_URL=`https://docs.google.com/spreadsheets/d/${ENV_SHEE
 const LANG = {
   es: {
     // Header
-    brandSub: "Mundial 2026 de Papo",
-    brandTitle: "Centro de Mando del Mundial 2026 de Papo",
+    brandSub: "Zona Mundialista",
+    brandTitle: "Zona Mundialista 2026",
     brandDesc: "Cuatro vistas conectadas: Partidos del Día, Mapa de Partidos, Estadísticas y Polla Mundialista.",
     dataMode: "Modo de datos:",
     apiLive: "API en Vivo Conectada",
@@ -115,8 +115,8 @@ const LANG = {
     evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
   },
   en: {
-    brandSub: "Papo's 2026 World Cup",
-    brandTitle: "Papo's 2026 World Cup Command Center",
+    brandSub: "Zona Mundialista",
+    brandTitle: "Zona Mundialista 2026",
     brandDesc: "Four connected views: Today's Games, Fixture Map, Statistics Center and Prediction Game.",
     dataMode: "Data mode:",
     apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
@@ -409,6 +409,37 @@ const DEMO_PLAYERS = [
 const fl=document.createElement("link");
 fl.href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap";
 fl.rel="stylesheet";document.head.appendChild(fl);
+// Hide scrollbar on mobile nav
+const mobileCSS = document.createElement("style");
+mobileCSS.textContent = `*{-webkit-tap-highlight-color:transparent}::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:4px}@media(max-width:768px){.nav-scroll::-webkit-scrollbar{display:none}}`;
+document.head.appendChild(mobileCSS);
+
+// Countdown to World Cup kickoff: June 11, 2026
+// Mobile detection
+function useIsMobile(bp=768) {
+  const [m, setM] = useState(typeof window!=="undefined" && window.innerWidth < bp);
+  useEffect(() => {
+    const h = () => setM(window.innerWidth < bp);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, [bp]);
+  return m;
+}
+
+const WC_START = new Date("2026-06-11T17:00:00-04:00").getTime();
+function Countdown() {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const id = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(id); }, []);
+  const diff = WC_START - now;
+  if(diff <= 0) return <span style={{fontSize:12,fontWeight:700,color:"#10b981"}}>⚽ EN VIVO</span>;
+  const days = Math.ceil(diff/86400000);
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days}</span>
+      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>días para<br/>el Mundial</span>
+    </div>
+  );
+}
 
 const ff = "'Outfit',sans-serif";
 const fb = "'Bebas Neue',sans-serif";
@@ -489,6 +520,7 @@ function GameCard({match:m, selected, onClick}) {
 // ─────────────────────────────────────────────
 function MatchDetail({match:m, onEdit}) {
   const t=_t;
+  const mobile=useIsMobile();
   if(!m) return (
     <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"100%",color:"#6B7280",fontSize:14,padding:40,textAlign:"center"}}>
       Selecciona un partido de la lista para ver detalles, eventos y estadísticas.
@@ -521,11 +553,11 @@ function MatchDetail({match:m, onEdit}) {
         </div>
         <div style={{textAlign:"center"}}>
           {m.status !== "upcoming" ? (
-            <div style={{fontFamily:fb,fontSize:56,color:"#1B2A6B",letterSpacing:4}}>
+            <div style={{fontFamily:fb,fontSize:mobile?40:56,color:"#1B2A6B",letterSpacing:4}}>
               {m.homeScore}<span style={{color:"#9CA3AF",margin:"0 6px"}}>:</span>{m.awayScore}
             </div>
           ) : (
-            <div style={{fontFamily:fb,fontSize:28,color:"#9CA3AF",letterSpacing:4}}>VS</div>
+            <div style={{fontFamily:fb,fontSize:mobile?20:28,color:"#9CA3AF",letterSpacing:4}}>VS</div>
           )}
         </div>
         <div style={{textAlign:"center"}}>
@@ -715,6 +747,7 @@ function EditModal({match:m, onSave, onClose}) {
 // ─────────────────────────────────────────────
 function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSelectedMatch, onEdit}) {
   const t=_t;
+  const mobile=useIsMobile();
   const dayMatches = useMemo(()=> fixtures.filter(f=>f.date===selectedDate), [fixtures,selectedDate]);
   const jugados = dayMatches.filter(f=>f.status==="ft");
   const live = dayMatches.filter(f=>f.status==="live");
@@ -723,7 +756,7 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
   return (
     <div style={{display:"grid",gridTemplateColumns:"380px 1fr",gap:0,minHeight:"calc(100vh - 180px)"}}>
       {/* LEFT: Game list */}
-      <div style={{borderRight:"1px solid #E5E7EB",padding:"20px 16px",overflow:"auto",maxHeight:"calc(100vh - 180px)"}}>
+      <div style={{borderRight:"1px solid #E5E7EB",padding:"20px 16px",overflow:"auto",maxHeight:mobile?"none":"calc(100vh - 180px)"}}>
         {/* Date nav */}
         <div style={{display:"flex",gap:4,marginBottom:16,flexWrap:"wrap"}}>
           {MATCH_DATES.map(d=>(
@@ -763,7 +796,7 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
       </div>
 
       {/* RIGHT: Match detail */}
-      <div style={{overflow:"auto",maxHeight:"calc(100vh - 180px)"}}>
+      <div style={{overflow:"auto",maxHeight:mobile?"none":"calc(100vh - 180px)"}}>
         <MatchDetail match={selectedMatch} onEdit={onEdit}/>
       </div>
     </div>
@@ -775,6 +808,7 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
 // ─────────────────────────────────────────────
 function FixturesPage({fixtures, onSelect}) {
   const t=_t;
+  const mobile=useIsMobile();
   const [gf, setGf] = useState("ALL");
   const list = gf==="ALL" ? fixtures : fixtures.filter(f=>f.group===gf);
   return (<div style={{padding:"20px 0"}}>
@@ -836,6 +870,7 @@ function fbtn(a){return{padding:"6px 14px",borderRadius:8,border:"1px solid rgba
 // ─────────────────────────────────────────────
 function StatsPage({fixtures}) {
   const t=_t;
+  const mobile=useIsMobile();
   const [selTeam, setSelTeam] = useState(null);
   const [statsView, setStatsView] = useState("tournament"); // tournament | team
   const done = fixtures.filter(f=>f.status==="ft"||f.status==="live");
@@ -968,7 +1003,7 @@ function StatsPage({fixtures}) {
         ))}
       </div>
 
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20,marginBottom:20}}>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:mobile?16:20,marginBottom:20}}>
         {/* Match results */}
         <div style={card()}>
           <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:12}}>{t.matchResults}</div>
@@ -1024,7 +1059,7 @@ function StatsPage({fixtures}) {
       {/* Performance bars */}
       <div style={card()}>
         <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:16}}>{t.perfMetrics}</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+        <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:mobile?16:20}}>
           <StatBar label="Goles Anotados" value={ts.gf} max={maxGoals} color="#10b981"/>
           <StatBar label="Goles Recibidos" value={ts.ga} max={maxGoals} color="#ef4444"/>
           <StatBar label="Total de Tiros" value={ts.shots} max={maxShots} color="#2E5DB5"/>
@@ -1068,7 +1103,7 @@ function StatsPage({fixtures}) {
     {/* Team selector */}
     <div style={{marginBottom:24}}>
       <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#6B7280",marginBottom:12}}>{t.selectTeam}</div>
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:6}}>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(3,1fr)":"repeat(auto-fill,minmax(130px,1fr))",gap:6}}>
         {ALL_TEAMS.map(t=>{
           const hasData = !!teamStats[t.name];
           return (<button key={t.name} onClick={()=>selectTeam(t.name)} style={{
@@ -1221,6 +1256,7 @@ const DEMO_AI_PREDS = [
 
 function AIPredsPage() {
   const t=_t;
+  const mobile=useIsMobile();
   const [bsdKey, setBsdKey] = useState(ENV_BSD_KEY);
   const [bsdPreds, setBsdPreds] = useState([]);
   const [bsdLoading, setBsdLoading] = useState(false);
@@ -1294,7 +1330,7 @@ function AIPredsPage() {
           {bsdLoading ? "Cargando predicciones..." : "Sin predicciones disponibles."}
         </div>
       ) : (
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(380px,1fr))",gap:16}}>
+        <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(380px,1fr))",gap:16}}>
           {preds.map((p,i)=>{
             const ht=team(p.home), at=team(p.away);
             const maxProb = Math.max(p.homeWin,p.draw,p.awayWin);
@@ -1371,6 +1407,7 @@ function calcPts(player, fixtures) {
 
 function PredictionsPage({fixtures,uploaded,setUploaded}) {
   const t=_t;
+  const mobile=useIsMobile();
   const [sel,setSel]=useState(null);
   const [filter,setFilter]=useState("all");
   const [showDemo,setShowDemo]=useState(true);
@@ -1583,18 +1620,18 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
             <span style={{fontSize:12,fontWeight:700,padding:"3px 12px",borderRadius:20,background:sel.group==="friends"?"rgba(6,182,212,.12)":"rgba(244,63,94,.12)",color:sel.group==="friends"?"#1B2A6B":"#009B3A",marginTop:6,display:"inline-block"}}>{sel.group==="friends"?t.friends.charAt(0).toUpperCase()+t.friends.slice(1).toLowerCase():t.family.charAt(0).toUpperCase()+t.family.slice(1).toLowerCase()}</span></div>
           <div style={{textAlign:"center"}}><div style={{fontFamily:fb,fontSize:48,color:"#D4A843"}}>{pts.total}</div><div style={{fontSize:12,fontWeight:700,color:"#4B5563"}}>PUNTOS</div></div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginTop:20}}>
+        <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:10,marginTop:20}}>
           {[{v:pts.rCount,l:t.resultados,s:`${pts.rPts} pts`,c:"#1B2A6B"},{v:pts.eCount,l:t.exactos,s:`${pts.ePts} pts`,c:"#10b981"},{v:Object.keys(sel.groupWinners||{}).length,l:t.grupos,s:`${pts.gPts} pts`,c:"#C8102E"},{v:"—",l:t.bonos,s:"0 pts",c:"#D4A843"}].map(x=>(<div key={x.l} style={{background:"#FFFFFF",borderRadius:12,padding:"12px 10px",textAlign:"center",border:"1px solid rgba(0,0,0,.05)"}}>
             <div style={{fontFamily:fb,fontSize:22,color:x.c}}>{x.v}</div><div style={{fontSize:12,color:"#4B5563"}}>{x.l}</div><div style={{fontSize:12,fontWeight:700,color:x.c,marginTop:2}}>{x.s}</div></div>))}
         </div>
       </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+      <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:mobile?16:20}}>
         <div style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:20}}>
           <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:16}}>{t.preTournament}</div>
           {[{l:"Campeón",v:sel.champion},{l:"Bota de Oro",v:sel.goldenBoot}].map(x=>(<div key={x.l} style={{padding:"10px 14px",background:"#FFFFFF",borderRadius:10,marginBottom:8}}>
             <div style={{fontSize:12,color:"#4B5563",fontWeight:600}}>{x.l}</div><div style={{fontSize:16,fontWeight:700,color:"#1F2937",marginTop:2}}>{x.v||"—"}</div></div>))}
           <div style={{fontFamily:fb,fontSize:16,letterSpacing:2,color:"#1B2A6B",marginTop:20,marginBottom:12}}>{t.groupWinners}</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+          <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"1fr 1fr",gap:6}}>
             {Object.entries(sel.groupWinners||{}).map(([g,pick])=>{
               const st=calcStandings(g,fixtures);const actual=st.length>0&&st[0].mp>0?st[0].name:null;const ok=actual&&actual===pick;
               return(<div key={g} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"6px 10px",borderRadius:8,fontSize:12,background:!actual?"rgba(255,255,255,.02)":ok?"rgba(16,185,129,.08)":"rgba(239,68,68,.08)",border:`1px solid ${!actual?"rgba(0,0,0,.05)":ok?"rgba(16,185,129,.2)":"rgba(239,68,68,.2)"}`}}>
@@ -1847,6 +1884,7 @@ export default function App() {
   const [lang, setLang] = useState("es");
   const t=LANG[lang]||LANG.es;
   _t=t;
+  const mobile = useIsMobile();
   const [appReady, setAppReady] = useState(false);
   const [fixtures, setFixtures] = useState(initFixtures);
   const [page, setPage] = useState("home");
@@ -1910,7 +1948,7 @@ export default function App() {
   if(!appReady) return (
     <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#1F2937"}}>
       <div style={{fontSize:72,marginBottom:16}}>⚽</div>
-      <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#1B2A6B",marginBottom:8}}>{t.brandTitle}</div>
+      <div style={{fontFamily:fb,fontSize:mobile?24:36,letterSpacing:3,color:"#1B2A6B",marginBottom:8}}>Zona Mundialista 2026</div>
       <div style={{fontSize:14,color:"#6B7280"}}>Cargando...</div>
     </div>
   );
@@ -1918,69 +1956,51 @@ export default function App() {
   return (
     <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",color:"#1F2937"}}>
       {/* ─── HEADER ─── */}
-      <div style={{background:"linear-gradient(135deg,#1B2A6B 0%,#243A8E 100%)",borderBottom:"3px solid #C8102E",padding:"20px 24px 16px",position:"relative",position:"relative"}}>
-        <div style={{maxWidth:1280,margin:"0 auto"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:16,marginBottom:16}}>
-            <div>
-              <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,.8)",letterSpacing:2,textTransform:"uppercase",marginBottom:4,display:"flex",alignItems:"center",gap:6}}>
-                <span style={{width:8,height:8,borderRadius:4,background:"#1B2A6B"}}/>{t.brandSub}
-              </div>
-              <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,lineHeight:1.1,
-                background:"linear-gradient(90deg,#fff 0%,#94a3b8 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>
-                {t.brandTitle}
-              </div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,.8)",marginTop:4,maxWidth:480}}>
-                {t.brandDesc}
-              </div>
-              <div style={{marginTop:8,fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)"}}>
-                {t.dataMode} <span style={{color:apiConnected?"#10b981":demoMode?"#1B2A6B":"#D4A843"}}>{apiConnected?t.apiLive:demoMode?t.demoActive:t.manualMode}</span>
-              </div>
+      <div style={{background:"linear-gradient(135deg,#1B2A6B 0%,#243A8E 100%)",borderBottom:"3px solid #C8102E",padding:mobile?"12px 16px":"16px 24px"}}>
+        <div style={{maxWidth:1280,margin:"0 auto",padding:mobile?"0":"0"}}>
+          {/* Row 1: Title + Countdown + Stats + Lang */}
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:mobile?8:12,marginBottom:mobile?8:12}}>
+            <div style={{fontFamily:fb,fontSize:mobile?22:32,letterSpacing:mobile?2:3,lineHeight:1,color:"#FFFFFF"}}>
+              Zona Mundialista 2026
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
-              <button onClick={()=>setLang(l=>l==="es"?"en":"es")} style={{position:"absolute",top:12,right:12,padding:"6px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(0,0,0,.1)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:ff,letterSpacing:1,zIndex:10}}>{lang==="es"?"EN 🇺🇸":"ES 🇪🇸"}</button>
-              {[{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities},{v:"5",l:t.views}].map(x=>(
-                <div key={x.l} style={{background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.2)",borderRadius:12,padding:"10px 14px",textAlign:"center",minWidth:72}}>
-                  <div style={{fontFamily:fb,fontSize:28,color:"#fff",letterSpacing:1}}>{x.v}</div>
-                  <div style={{fontSize:12,color:"#D4A843",fontWeight:700,letterSpacing:1}}>{x.l}</div>
+            <div style={{display:"flex",alignItems:"center",gap:mobile?8:16}}>
+              <Countdown/>
+              {!mobile && [{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities}].map(x=>(
+                <div key={x.l} style={{background:"rgba(255,255,255,.1)",borderRadius:8,padding:"6px 12px",textAlign:"center"}}>
+                  <span style={{fontFamily:fb,fontSize:20,color:"#fff"}}>{x.v}</span>
+                  <span style={{fontSize:12,color:"#D4A843",fontWeight:700,marginLeft:4}}>{x.l}</span>
                 </div>
               ))}
+              <button onClick={()=>setLang(l=>l==="es"?"en":"es")} style={{padding:"5px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(0,0,0,.1)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:ff}}>{lang==="es"?"EN 🇺🇸":"ES 🇪🇸"}</button>
             </div>
           </div>
-
-          {/* Action buttons */}
-          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
-            <button onClick={simulateDemo} style={{padding:"8px 18px",borderRadius:10,border:"1px solid rgba(0,0,0,.1)",cursor:"pointer",background:"rgba(255,255,255,.12)",color:"#FFFFFF",fontSize:12,fontWeight:600,fontFamily:ff,display:"flex",alignItems:"center",gap:6}}>
-              {`⚡ ${t.simulate}`}
-            </button>
-            <button onClick={resetData} style={{padding:"8px 18px",borderRadius:10,border:"1px solid rgba(0,0,0,.1)",cursor:"pointer",background:"#F3F4F6",border:"1px solid #E5E7EB",color:"#4B5563",fontSize:12,fontWeight:600,fontFamily:ff,display:"flex",alignItems:"center",gap:6}}>
-              {`🔄 ${t.reset}`}
-            </button>
-            <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:12,fontSize:12,color:"rgba(255,255,255,.7)"}}>
-              <span>{totalPlayed} {t.finished}</span>
-              {totalLive>0&&<span style={{color:"#ef4444",fontWeight:700}}>{totalLive} {t.liveCount}</span>}
-              <span>{72-totalPlayed-totalLive} {t.upcomingCount}</span>
+          {/* Row 2: Nav + Actions */}
+          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+            <div style={{display:"flex",gap:3,background:"rgba(255,255,255,.08)",borderRadius:10,padding:3,overflowX:"auto",WebkitOverflowScrolling:"touch",flex:mobile?1:"none"}}>
+              {[{id:"home",label:t.navHome},{id:"fixtures",label:t.navFixtures},{id:"stats",label:t.navStats},{id:"ai",label:t.navAI},{id:"predictions",label:t.navPolla}].map(t=>(
+                <button key={t.id} onClick={()=>setPage(t.id)} style={{
+                  padding:mobile?"6px 10px":"7px 16px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:mobile?12:13,fontWeight:600,
+                  whiteSpace:"nowrap",transition:"all .15s",
+                  background:page===t.id?"#D4A843":"transparent",
+                  color:page===t.id?"#1B2A6B":"rgba(255,255,255,.7)",
+                }}>{t.label}</button>
+              ))}
             </div>
-          </div>
-
-          {/* API Fetch Panel */}
-          <FetchPanel fixtures={fixtures} onUpdate={handleApiUpdate}/>
-
-          {/* Nav tabs */}
-          <div style={{display:"flex",gap:4,background:"rgba(255,255,255,.1)",borderRadius:12,padding:4,width:"fit-content"}}>
-            {[{id:"home",icon:"🏠",label:t.navHome},{id:"fixtures",icon:"🏟️",label:t.navFixtures},{id:"stats",icon:"📊",label:t.navStats},{id:"ai",icon:"🤖",label:t.navAI},{id:"predictions",icon:"🏆",label:t.navPolla}].map(t=>(
-              <button key={t.id} onClick={()=>setPage(t.id)} style={{
-                padding:"10px 22px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:600,
-                letterSpacing:.3,transition:"all .2s",display:"flex",alignItems:"center",gap:6,
-                background:page===t.id?"#D4A843":"transparent",
-                color:page===t.id?"#fff":"#94a3b8",
-              }}>{t.icon} {t.label}</button>
-            ))}
+            {!mobile && <div style={{display:"flex",alignItems:"center",gap:6,marginLeft:"auto"}}>
+              <FetchPanel fixtures={fixtures} onUpdate={handleApiUpdate}/>
+              <button onClick={simulateDemo} style={{padding:"5px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.15)",cursor:"pointer",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:12,fontWeight:600,fontFamily:ff}}>
+                {`⚡ ${t.simulate}`}
+              </button>
+              <button onClick={resetData} style={{padding:"5px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.15)",cursor:"pointer",background:"rgba(255,255,255,.08)",color:"rgba(255,255,255,.7)",fontSize:12,fontWeight:600,fontFamily:ff}}>
+                {`🔄 ${t.reset}`}
+              </button>
+            </div>}
           </div>
         </div>
       </div>
 
       {/* ─── CONTENT ─── */}
-      <div style={{maxWidth:1280,margin:"0 auto"}}>
+      <div style={{maxWidth:1280,margin:"0 auto",padding:mobile?"0 12px":"0"}}>
         {page==="home" && <HomePage fixtures={fixtures} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedMatch={liveSelected} setSelectedMatch={setSelectedMatch} onEdit={setEditMatch}/>}
         {page==="fixtures" && <FixturesPage fixtures={fixtures} onSelect={handleFixtureSelect}/>}
         {page==="stats" && <StatsPage fixtures={fixtures}/>}
@@ -1990,6 +2010,7 @@ export default function App() {
 
       {/* ─── EDIT MODAL ─── */}
       {editMatch && <EditModal match={editMatch} onSave={handleSave} onClose={()=>setEditMatch(null)}/>}
+      <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>Creado por JPTDesign</div>
     </div>
   );
 }
