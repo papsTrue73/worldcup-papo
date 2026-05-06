@@ -1,13 +1,21 @@
-import { useState, useCallback, useMemo} from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 
 // ─────────────────────────────────────────────
 //  TRANSLATIONS
 // ─────────────────────────────────────────────
+// Environment variables — injected by Vite's define config at build time
+// Falls back silently in non-Vite environments (artifact sandbox, etc.)
+let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_ID="",ENV_SHEET_URL="";
+try{ENV_FOOTBALL_KEY=__FOOTBALL_KEY__}catch(e){}
+try{ENV_BSD_KEY=__BSD_KEY__}catch(e){}
+try{ENV_SHEET_ID=__SHEET_ID__}catch(e){}
+if(ENV_SHEET_ID)ENV_SHEET_URL=`https://docs.google.com/spreadsheets/d/${ENV_SHEET_ID}/edit`;
+
 const LANG = {
   es: {
     // Header
-    brandSub: "Mundial 2026",
-    brandTitle: "Centro de Mando del Mundial 2026 - Papo",
+    brandSub: "Mundial 2026 de Papo",
+    brandTitle: "Centro de Mando del Mundial 2026 de Papo",
     brandDesc: "Cuatro vistas conectadas: Partidos del Día, Mapa de Partidos, Estadísticas y Polla Mundialista.",
     dataMode: "Modo de datos:",
     apiLive: "API en Vivo Conectada",
@@ -18,7 +26,7 @@ const LANG = {
     matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
     finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
     // Nav
-    navHome: "Inicio / Hoy", navFixtures: "Partidos", navStats: "Estadísticas", navPolla: "Polla Mundialista",
+    navHome: "Inicio / Hoy", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones AI", navPolla: "Polla Mundialista",
     // Status
     statusFt: "Final", statusLive: "En Vivo", statusUpcoming: "Próximo",
     // Home
@@ -115,7 +123,7 @@ const LANG = {
     simulate: "Simulate API refresh", reset: "Reset data",
     matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
-    navHome: "Home / Today", navFixtures: "Fixture Map", navStats: "Statistics Center", navPolla: "Polla Mundialista",
+    navHome: "Home / Today", navFixtures: "Fixture Map", navStats: "Statistics Center", navAI: "AI Predictions", navPolla: "Polla Mundialista",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
     todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
     todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
@@ -1181,6 +1189,171 @@ function StatBar({label,value,max,color}) {
 // ─────────────────────────────────────────────
 //  PAGE 4: PREDICTIONS
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+//  PAGE: AI PREDICTIONS (BSD)
+// ─────────────────────────────────────────────
+const DEMO_AI_PREDS = [
+  {home:"Mexico",away:"South Africa",date:"Jun 11",group:"A",homeWin:58,draw:24,awayWin:18,btts:42,over25:55,
+    oddsH:"1.72",oddsD:"3.40",oddsA:"5.25",homeForm:"WWDWW",awayForm:"WLDLD",
+    insight:"México llega como favorito en casa. Historial reciente dominante en partidos inaugurales."},
+  {home:"South Korea",away:"Czechia",date:"Jun 11",group:"A",homeWin:38,draw:30,awayWin:32,btts:48,over25:51,
+    oddsH:"2.45",oddsD:"3.20",oddsA:"2.90",homeForm:"WDWLD",awayForm:"DWWDL",
+    insight:"Partido muy parejo. Ambos equipos con rendimiento similar en clasificatorias."},
+  {home:"Canada",away:"Bosnia & Herz.",date:"Jun 12",group:"B",homeWin:52,draw:26,awayWin:22,btts:45,over25:48,
+    oddsH:"1.90",oddsD:"3.30",oddsA:"4.10",homeForm:"WWWDL",awayForm:"LDWDW",
+    insight:"Canadá con ventaja de local. Bosnia peligrosa en contraataque."},
+  {home:"USA",away:"Paraguay",date:"Jun 12",group:"D",homeWin:62,draw:22,awayWin:16,btts:38,over25:52,
+    oddsH:"1.55",oddsD:"3.80",oddsA:"6.50",homeForm:"WWWWW",awayForm:"WDLDW",
+    insight:"EE.UU. gran favorito en casa. Paraguay busca la sorpresa con bloque defensivo."},
+  {home:"Brazil",away:"Morocco",date:"Jun 13",group:"C",homeWin:55,draw:25,awayWin:20,btts:52,over25:60,
+    oddsH:"1.78",oddsD:"3.50",oddsA:"4.60",homeForm:"WWDWW",awayForm:"WWWDW",
+    insight:"Brasil favorito pero Marruecos viene de un gran Mundial 2022. Partido abierto."},
+  {home:"Germany",away:"Curaçao",date:"Jun 14",group:"E",homeWin:88,draw:8,awayWin:4,btts:28,over25:78,
+    oddsH:"1.08",oddsD:"10.0",oddsA:"28.0",homeForm:"WWWWW",awayForm:"WLDLL",
+    insight:"Dominio total esperado de Alemania. Curaçao busca minimizar la diferencia."},
+  {home:"Netherlands",away:"Japan",date:"Jun 14",group:"F",homeWin:45,draw:28,awayWin:27,btts:55,over25:58,
+    oddsH:"2.15",oddsD:"3.30",oddsA:"3.40",homeForm:"WDWWL",awayForm:"WWWWW",
+    insight:"Japón en su mejor momento. Países Bajos con la calidad pero Japón es impredecible."},
+  {home:"Argentina",away:"Algeria",date:"Jun 16",group:"J",homeWin:75,draw:16,awayWin:9,btts:35,over25:58,
+    oddsH:"1.28",oddsD:"5.50",oddsA:"11.0",homeForm:"WWWWW",awayForm:"DWWLD",
+    insight:"Argentina campeón vigente. Argelia competitiva pero la diferencia de calidad es grande."},
+];
+
+function AIPredsPage() {
+  const t=_t;
+  const [bsdKey, setBsdKey] = useState(ENV_BSD_KEY);
+  const [bsdPreds, setBsdPreds] = useState([]);
+  const [bsdLoading, setBsdLoading] = useState(false);
+  const [bsdMsg, setBsdMsg] = useState(null);
+  const [bsdConnected, setBsdConnected] = useState(false);
+  const [showDemo, setShowDemo] = useState(true);
+
+  const preds = bsdConnected ? bsdPreds : (showDemo ? DEMO_AI_PREDS : []);
+
+  const fetchBSD = useCallback(async () => {
+    if(!bsdKey.trim()){setBsdMsg({ok:false,msg:t.apiKeyFirst || "Ingresa la API key"});return}
+    setBsdLoading(true); setBsdMsg(null);
+    try {
+      const res = await fetch("https://sports.bzzoiro.com/api/events/?competition=world-cup",{
+        headers:{"Authorization":`Token ${bsdKey.trim()}`}
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status} — Verifica tu API key`);
+      const data = await res.json();
+      const events = data.results || data || [];
+      const mapped = events.map(e=>({
+        home: e.home_team || "?", away: e.away_team || "?",
+        date: e.start_time ? new Date(e.start_time).toLocaleDateString() : "?",
+        group: e.group || "",
+        homeWin: Math.round((e.predictions?.home_win || e.odds_home_prob || 0)*100),
+        draw: Math.round((e.predictions?.draw || e.odds_draw_prob || 0)*100),
+        awayWin: Math.round((e.predictions?.away_win || e.odds_away_prob || 0)*100),
+        btts: Math.round((e.predictions?.btts || 0)*100),
+        over25: Math.round((e.predictions?.over_25 || 0)*100),
+        oddsH: e.odds_home || "—", oddsD: e.odds_draw || "—", oddsA: e.odds_away || "—",
+        homeForm: e.home_form || "", awayForm: e.away_form || "",
+        insight: e.predictions?.insight || "",
+      })).filter(e=>e.homeWin>0);
+      setBsdPreds(mapped);
+      setBsdConnected(true);
+      setBsdMsg({ok:true, msg:`${mapped.length} predicciones cargadas desde BSD`});
+    } catch(err) {
+      setBsdMsg({ok:false, msg:err.message});
+    }
+    setBsdLoading(false);
+  },[bsdKey]);
+
+  // Auto-fetch on mount if BSD key is available
+  useEffect(() => { if(ENV_BSD_KEY) fetchBSD(); }, []);
+
+  const ProbBar = ({label,pct,color}) => (
+    <div style={{flex:1,textAlign:"center"}}>
+      <div style={{fontSize:13,fontWeight:700,color,marginBottom:4}}>{pct}%</div>
+      <div style={{height:6,borderRadius:3,background:"#E5E7EB",overflow:"hidden"}}>
+        <div style={{height:"100%",borderRadius:3,background:color,width:`${pct}%`,transition:"width .5s"}}/>
+      </div>
+      <div style={{fontSize:12,color:"#6B7280",marginTop:4}}>{label}</div>
+    </div>
+  );
+
+  return (
+    <div style={{padding:"20px 0"}}>
+      <div style={{fontFamily:fb,fontSize:28,letterSpacing:2,color:"#1B2A6B",marginBottom:4}}>
+        {t.navAI || "PREDICCIONES AI"}
+      </div>
+      <div style={{fontSize:13,color:"#6B7280",marginBottom:12}}>
+        Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data. Probabilidades de victoria, empate, goles y cuotas de múltiples casas de apuestas.
+      </div>
+      {bsdMsg && <div style={{marginBottom:16,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
+        background:bsdMsg.ok?"#10b98110":"#ef444410",color:bsdMsg.ok?"#10b981":"#ef4444"}}>
+        {bsdConnected && <span style={{width:6,height:6,borderRadius:3,background:"#10b981"}}/>}{bsdMsg.msg}
+      </div>}
+
+      {/* Predictions Grid */}
+      {preds.length===0 ? (
+        <div style={{textAlign:"center",padding:40,color:"#6B7280",fontSize:14}}>
+          {bsdLoading ? "Cargando predicciones..." : "Sin predicciones disponibles."}
+        </div>
+      ) : (
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(380px,1fr))",gap:16}}>
+          {preds.map((p,i)=>{
+            const ht=team(p.home), at=team(p.away);
+            const maxProb = Math.max(p.homeWin,p.draw,p.awayWin);
+            return (
+              <div key={i} style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:16,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
+                {/* Header */}
+                <div style={{padding:"12px 16px",background:"#F9FAFB",borderBottom:"1px solid #F3F4F6",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                  <span style={{fontSize:12,fontWeight:600,color:"#6B7280",letterSpacing:1}}>
+                    {p.group ? `GRUPO ${p.group} · `:""}{p.date}
+                  </span>
+                  <span style={{fontSize:12,fontWeight:700,padding:"2px 10px",borderRadius:12,background:"#1B2A6B10",color:"#1B2A6B"}}>🤖 AI</span>
+                </div>
+                {/* Teams */}
+                <div style={{padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+                  <div style={{textAlign:"center",flex:1}}>
+                    <div style={{fontSize:28}}>{ht.flag}</div>
+                    <div style={{fontSize:13,fontWeight:700,color:"#1F2937",marginTop:4}}>{p.home}</div>
+                    {p.homeForm && <div style={{fontSize:12,color:"#6B7280",marginTop:2,letterSpacing:2}}>{p.homeForm}</div>}
+                  </div>
+                  <div style={{fontFamily:fb,fontSize:20,color:"#9CA3AF",letterSpacing:2}}>VS</div>
+                  <div style={{textAlign:"center",flex:1}}>
+                    <div style={{fontSize:28}}>{at.flag}</div>
+                    <div style={{fontSize:13,fontWeight:700,color:"#1F2937",marginTop:4}}>{p.away}</div>
+                    {p.awayForm && <div style={{fontSize:12,color:"#6B7280",marginTop:2,letterSpacing:2}}>{p.awayForm}</div>}
+                  </div>
+                </div>
+                {/* Probability bars */}
+                <div style={{padding:"0 16px 12px",display:"flex",gap:12}}>
+                  <ProbBar label={p.home} pct={p.homeWin} color={p.homeWin===maxProb?"#1B2A6B":"#9CA3AF"}/>
+                  <ProbBar label="Empate" pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
+                  <ProbBar label={p.away} pct={p.awayWin} color={p.awayWin===maxProb?"#C8102E":"#9CA3AF"}/>
+                </div>
+                {/* Odds + markets */}
+                <div style={{padding:"12px 16px",background:"#F9FAFB",borderTop:"1px solid #F3F4F6"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                    <div style={{display:"flex",gap:8}}>
+                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#1B2A6B10",color:"#1B2A6B",fontWeight:700}}>1: {p.oddsH}</span>
+                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#D4A84320",color:"#B8860B",fontWeight:700}}>X: {p.oddsD}</span>
+                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#C8102E10",color:"#C8102E",fontWeight:700}}>2: {p.oddsA}</span>
+                    </div>
+                    <div style={{display:"flex",gap:6}}>
+                      {p.btts>0 && <span style={{fontSize:12,padding:"2px 8px",borderRadius:6,background:"#10b98110",color:"#10b981",fontWeight:600}}>BTTS {p.btts}%</span>}
+                      {p.over25>0 && <span style={{fontSize:12,padding:"2px 8px",borderRadius:6,background:"#7c3aed10",color:"#6B3FA0",fontWeight:600}}>O2.5 {p.over25}%</span>}
+                    </div>
+                  </div>
+                  {p.insight && <div style={{fontSize:12,color:"#4B5563",lineHeight:1.5,fontStyle:"italic"}}>💡 {p.insight}</div>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+//  PAGE 5: POLLA MUNDIALISTA
+// ─────────────────────────────────────────────
 function calcPts(player, fixtures) {
   let rPts=0,ePts=0,gPts=0,rCount=0,eCount=0;
   fixtures.filter(f=>f.status==="ft"||f.status==="live").forEach(f=>{
@@ -1202,9 +1375,18 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
   const [filter,setFilter]=useState("all");
   const [showDemo,setShowDemo]=useState(true);
   const [importMsg,setImportMsg]=useState(null);
-  const [sheetUrl,setSheetUrl]=useState("");
+  const [sheetUrl,setSheetUrl]=useState(ENV_SHEET_URL);
   const [sheetConnected,setSheetConnected]=useState(false);
   const [loading,setLoading]=useState(false);
+
+  // Auto-connect if Sheet URL comes from env vars
+  const [autoLoaded, setAutoLoaded] = useState(false);
+  useEffect(() => {
+    if(ENV_SHEET_URL && !autoLoaded && !sheetConnected && uploaded.length === 0) {
+      setAutoLoaded(true);
+      fetchFromGoogleSheets();
+    }
+  }, [autoLoaded, sheetConnected, uploaded.length]);
 
   const all=[...(showDemo?DEMO_PLAYERS:[]),...uploaded];
   const fri=all.filter(p=>p.group==="friends");
@@ -1442,42 +1624,14 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
   return(<div style={{padding:"20px 0"}}>
     <div style={{fontFamily:fb,fontSize:24,letterSpacing:2,color:"#1B2A6B",marginBottom:4}}>POLLA MUNDIALISTA</div>
     <div style={{fontSize:13,color:"#4B5563",marginBottom:16}}>{t.pollaDesc}</div>
-    {/* Google Sheets connection panel */}
-    <div style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:"20px 24px",marginBottom:20,boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
-      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
-        <span style={{fontSize:20}}>📊</span>
-        <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>Conectar Google Sheets</div>
-        {sheetConnected && <span style={{fontSize:12,fontWeight:700,padding:"3px 10px",borderRadius:20,background:"#10b98115",color:"#10b981"}}>Conectado</span>}
+    {/* Status bar */}
+    {importMsg && <div style={{marginBottom:16,display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+      <div style={{fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
+        background:importMsg.ok?"#10b98110":"#ef444410",color:importMsg.ok?"#10b981":"#ef4444"}}>
+        {sheetConnected && <span style={{width:6,height:6,borderRadius:3,background:"#10b981"}}/>}{importMsg.msg}
       </div>
-      <div style={{fontSize:12,color:"#6B7280",marginBottom:12,lineHeight:1.6}}>
-        Pega la URL de tu Google Sheet publicado. El documento debe tener dos hojas: <b style={{color:"#1F2937"}}>"Picks"</b> (pre-torneo) y <b style={{color:"#1F2937"}}>"Predicciones"</b> (partidos).
-      </div>
-      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-        <input
-          type="text"
-          value={sheetUrl}
-          onChange={e=>setSheetUrl(e.target.value)}
-          placeholder="https://docs.google.com/spreadsheets/d/tu-sheet-id/edit"
-          style={{flex:1,minWidth:280,padding:"10px 14px",background:"#F9FAFB",border:"1px solid #D1D5DB",borderRadius:10,color:"#1F2937",fontSize:13,fontFamily:ff,outline:"none",boxSizing:"border-box"}}
-        />
-        <button onClick={fetchFromGoogleSheets} disabled={loading} style={{
-          padding:"10px 22px",borderRadius:10,border:"none",cursor:loading?"default":"pointer",
-          background:loading?"#E5E7EB":"linear-gradient(135deg,#1B2A6B,#2E5DB5)",
-          color:loading?"#6B7280":"#fff",fontSize:13,fontWeight:600,fontFamily:ff,whiteSpace:"nowrap",
-        }}>{loading?"Cargando...":"Conectar"}</button>
-        {sheetConnected && <button onClick={fetchFromGoogleSheets} disabled={loading} style={{
-          padding:"10px 18px",borderRadius:10,border:"1px solid #D1D5DB",cursor:"pointer",
-          background:"#FFFFFF",color:"#4B5563",fontSize:13,fontWeight:600,fontFamily:ff,whiteSpace:"nowrap",
-        }}>↻ Actualizar</button>}
-      </div>
-      {importMsg && <div style={{marginTop:10,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,background:importMsg.ok?"#10b98110":"#ef444410",color:importMsg.ok?"#10b981":"#ef4444"}}>{importMsg.msg}</div>}
-      {!sheetConnected && <div style={{marginTop:12,padding:"12px 16px",background:"#F9FAFB",borderRadius:10,fontSize:12,color:"#6B7280",lineHeight:1.7}}>
-        <b style={{color:"#1B2A6B"}}>Instrucciones:</b><br/>
-        1. Abre tu Google Sheet → Archivo → Compartir → Publicar en la web<br/>
-        2. Selecciona "Documento completo" → Formato "Página web" → Publicar<br/>
-        3. Copia la URL de tu Sheet (la normal, no la publicada) y pégala arriba
-      </div>}
-    </div>
+      {sheetConnected && <button onClick={fetchFromGoogleSheets} disabled={loading} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #E5E7EB",background:"#FFFFFF",color:"#4B5563",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>↻ Actualizar</button>}
+    </div>}
     {/* Filters */}
     <div style={{display:"flex",gap:6,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
       {[{id:"all",l:"Todos"},{id:"friends",l:"Amigos"},{id:"family",l:"Familia"}].map(f=>(
@@ -1495,10 +1649,11 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
 function FetchPanel({fixtures, onUpdate}) {
   const t=_t;
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(ENV_FOOTBALL_KEY);
   const [status, setStatus] = useState(null); // {ok:bool, msg:string}
   const [loading, setLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   const mapEstado = (s) => {
     if(["FINISHED","AWARDED"].includes(s)) return "ft";
@@ -1628,34 +1783,59 @@ function FetchPanel({fixtures, onUpdate}) {
     setDetailsLoading(false);
   }, [apiKey, fixtures, onUpdate]);
 
+  // Auto-fetch on mount if key is available
+  useEffect(() => {
+    if(ENV_FOOTBALL_KEY && !loading) fetchMatches();
+  }, []);
+
+  // Auto-refresh polling
+  useEffect(() => {
+    if(!autoRefresh || !apiKey.trim()) return;
+    const id = setInterval(async () => {
+      try {
+        const res = await fetch("https://api.football-data.org/v4/competitions/WC/matches?season=2026",{
+          headers:{"X-Auth-Token":apiKey.trim()}
+        });
+        if(!res.ok) return;
+        const data = await res.json();
+        const matches = data.matches || [];
+        const next = [...fixtures];
+        let updated = 0;
+        matches.forEach(m => {
+          const home = TEAM_ALIASES[m.homeTeam?.name?.toLowerCase()] || m.homeTeam?.name;
+          const idx = next.findIndex(f => f.home === home);
+          if(idx < 0) return;
+          const st = mapEstado(m.status);
+          if(st !== "upcoming") {
+            next[idx] = {...next[idx], status:st, homeScore:m.score?.fullTime?.home ?? next[idx].homeScore, awayScore:m.score?.fullTime?.away ?? next[idx].awayScore};
+            updated++;
+          }
+        });
+        if(updated > 0) { onUpdate(next); setStatus({ok:true, msg:`Auto-refresh: ${updated} actualizado(s)`}); }
+      } catch(e) { /* silent */ }
+    }, 60000);
+    return () => clearInterval(id);
+  }, [autoRefresh, apiKey, fixtures, onUpdate]);
+
+  const hasKey = !!apiKey.trim();
+  const isConnected = hasKey && status?.ok;
+
   return (
-    <div style={{padding:"12px 16px",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.15)",borderRadius:12,marginBottom:16}}>
-      <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-        <div style={{fontSize:12,fontWeight:700,color:"#1B2A6B",letterSpacing:1,whiteSpace:"nowrap"}}>API EN VIVO</div>
-        <input
-          type="password"
-          value={apiKey}
-          onChange={e=>setApiKey(e.target.value)}
-          placeholder="Pega tu API key de football-data.org"
-          style={{flex:1,minWidth:200,maxWidth:320,padding:"7px 12px",background:"rgba(255,255,255,.1)",border:"1px solid rgba(255,255,255,.2)",
-            borderRadius:8,color:"#1F2937",fontSize:12,fontFamily:ff,outline:"none",boxSizing:"border-box"}}
-        />
-        <button onClick={fetchMatches} disabled={loading} style={{
-          padding:"7px 16px",borderRadius:8,border:"none",cursor:loading?"default":"pointer",
-          background:loading?"rgba(0,0,0,.05)":"linear-gradient(135deg,#1B2A6B,#C8102E)",
-          color:"#1B2A6B",fontSize:12,fontWeight:700,fontFamily:ff,opacity:loading?.6:1,whiteSpace:"nowrap",
-        }}>{loading?"Cargando...":t.fetchScores}</button>
-        <button onClick={fetchDetails} disabled={detailsLoading} style={{
-          padding:"7px 16px",borderRadius:8,border:"1px solid rgba(0,0,0,.1)",cursor:detailsLoading?"default":"pointer",
-          background:"rgba(255,255,255,.12)",color:"#FFFFFF",fontSize:12,fontWeight:600,fontFamily:ff,
-          opacity:detailsLoading?.6:1,whiteSpace:"nowrap",
-        }}>{detailsLoading?"Cargando...":"Obtener Detalles"}</button>
-        <div style={{fontSize:12,color:"#6B7280",marginLeft:"auto",whiteSpace:"nowrap"}}>Gratis · 10 req/min</div>
+    <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 16px",background:"rgba(255,255,255,.06)",borderRadius:10,marginBottom:12}}>
+      <div style={{width:8,height:8,borderRadius:4,background:isConnected?"#10b981":hasKey?"#D4A843":"#6B7280"}}/>
+      <span style={{fontSize:12,fontWeight:600,color:isConnected?"#10b981":hasKey?"#D4A843":"rgba(255,255,255,.5)"}}>
+        {isConnected?"API Conectada":loading?"Conectando...":hasKey?"Esperando datos":"Sin API key"}
+      </span>
+      {status?.msg && <span style={{fontSize:12,color:"rgba(255,255,255,.5)"}}>{status.msg}</span>}
+      <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
+        {hasKey && <button onClick={fetchMatches} disabled={loading} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,.15)",background:"transparent",color:"#FFFFFF",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff,opacity:loading?.5:1}}>
+          {loading?"...":"↻ Actualizar"}
+        </button>}
+        <label style={{display:"flex",alignItems:"center",gap:4,cursor:"pointer",fontSize:12,color:autoRefresh?"#10b981":"rgba(255,255,255,.4)",fontWeight:600}}>
+          <input type="checkbox" checked={autoRefresh} onChange={e=>setAutoRefresh(e.target.checked)} style={{accentColor:"#10b981"}}/>
+          Auto 60s
+        </label>
       </div>
-      {status && <div style={{marginTop:8,fontSize:12,fontWeight:600,padding:"5px 12px",borderRadius:6,display:"inline-block",
-        background:status.ok?"rgba(16,185,129,.1)":"rgba(245,158,11,.1)",
-        color:status.ok?"#10b981":"#D4A843",
-      }}>{status.msg}</div>}
     </div>
   );
 }
@@ -1667,6 +1847,7 @@ export default function App() {
   const [lang, setLang] = useState("es");
   const t=LANG[lang]||LANG.es;
   _t=t;
+  const [appReady, setAppReady] = useState(false);
   const [fixtures, setFixtures] = useState(initFixtures);
   const [page, setPage] = useState("home");
   const [selectedDate, setSelectedDate] = useState("Jun 11");
@@ -1675,6 +1856,9 @@ export default function App() {
   const [demoMode, setDemoMode] = useState(false);
   const [uploaded, setUploaded] = useState([]);
   const [apiConnected, setApiConnected] = useState(false);
+
+  // Initial loading
+  useEffect(() => { const timer = setTimeout(() => setAppReady(true), 800); return () => clearTimeout(timer); }, []);
 
   const totalPlayed = fixtures.filter(f=>f.status==="ft").length;
   const totalLive = fixtures.filter(f=>f.status==="live").length;
@@ -1723,6 +1907,14 @@ export default function App() {
   // Keep selectedMatch in sync with fixtures
   const liveSelected = selectedMatch ? fixtures.find(f=>f.id===selectedMatch.id) : null;
 
+  if(!appReady) return (
+    <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#1F2937"}}>
+      <div style={{fontSize:72,marginBottom:16}}>⚽</div>
+      <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#1B2A6B",marginBottom:8}}>{t.brandTitle}</div>
+      <div style={{fontSize:14,color:"#6B7280"}}>Cargando...</div>
+    </div>
+  );
+
   return (
     <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",color:"#1F2937"}}>
       {/* ─── HEADER ─── */}
@@ -1746,7 +1938,7 @@ export default function App() {
             </div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>
               <button onClick={()=>setLang(l=>l==="es"?"en":"es")} style={{position:"absolute",top:12,right:12,padding:"6px 14px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(0,0,0,.1)",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:ff,letterSpacing:1,zIndex:10}}>{lang==="es"?"EN 🇺🇸":"ES 🇪🇸"}</button>
-              {[{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities},{v:"4",l:t.views}].map(x=>(
+              {[{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities},{v:"5",l:t.views}].map(x=>(
                 <div key={x.l} style={{background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.2)",borderRadius:12,padding:"10px 14px",textAlign:"center",minWidth:72}}>
                   <div style={{fontFamily:fb,fontSize:28,color:"#fff",letterSpacing:1}}>{x.v}</div>
                   <div style={{fontSize:12,color:"#D4A843",fontWeight:700,letterSpacing:1}}>{x.l}</div>
@@ -1775,7 +1967,7 @@ export default function App() {
 
           {/* Nav tabs */}
           <div style={{display:"flex",gap:4,background:"rgba(255,255,255,.1)",borderRadius:12,padding:4,width:"fit-content"}}>
-            {[{id:"home",icon:"🏠",label:t.navHome},{id:"fixtures",icon:"🏟️",label:t.navFixtures},{id:"stats",icon:"📊",label:t.navStats},{id:"predictions",icon:"🏆",label:t.navPolla}].map(t=>(
+            {[{id:"home",icon:"🏠",label:t.navHome},{id:"fixtures",icon:"🏟️",label:t.navFixtures},{id:"stats",icon:"📊",label:t.navStats},{id:"ai",icon:"🤖",label:t.navAI},{id:"predictions",icon:"🏆",label:t.navPolla}].map(t=>(
               <button key={t.id} onClick={()=>setPage(t.id)} style={{
                 padding:"10px 22px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:600,
                 letterSpacing:.3,transition:"all .2s",display:"flex",alignItems:"center",gap:6,
@@ -1792,6 +1984,7 @@ export default function App() {
         {page==="home" && <HomePage fixtures={fixtures} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedMatch={liveSelected} setSelectedMatch={setSelectedMatch} onEdit={setEditMatch}/>}
         {page==="fixtures" && <FixturesPage fixtures={fixtures} onSelect={handleFixtureSelect}/>}
         {page==="stats" && <StatsPage fixtures={fixtures}/>}
+        {page==="ai" && <AIPredsPage/>}
         {page==="predictions" && <PredictionsPage fixtures={fixtures} uploaded={uploaded} setUploaded={setUploaded}/>}
       </div>
 
