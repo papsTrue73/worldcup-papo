@@ -806,12 +806,149 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
 // ─────────────────────────────────────────────
 //  PAGE 2: FIXTURES
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+//  KNOCKOUT BRACKET DATA
+// ─────────────────────────────────────────────
+const KNOCKOUT_INIT = () => ({
+  r32: Array.from({length:16},(_,i)=>({id:`r32_${i}`,home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"})),
+  r16: Array.from({length:8},(_,i)=>({id:`r16_${i}`,home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"})),
+  qf: Array.from({length:4},(_,i)=>({id:`qf_${i}`,home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"})),
+  sf: Array.from({length:2},(_,i)=>({id:`sf_${i}`,home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"})),
+  final: [{id:"final",home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"}],
+  third: [{id:"third",home:"TBD",away:"TBD",homeScore:null,awayScore:null,status:"upcoming"}],
+});
+
+function KnockoutBracket({mobile}) {
+  const t=_t;
+  const [ko, setKo] = useState(KNOCKOUT_INIT());
+  const [koView, setKoView] = useState("bracket");
+
+  const roundColors = {r32:"#1B2A6B",r16:"#C8102E",qf:"#009B3A",sf:"#D4A843",final:"#1B2A6B",third:"#6B7280"};
+  const roundLabels = {r32:"Octavos",r16:"Cuartos",qf:"Semifinal",sf:"Semifinal",final:"Final",third:"3er Puesto"};
+
+  const MatchCard = ({match, round, compact}) => {
+    const ht=team(match.home), at=team(match.away);
+    const rc = roundColors[round]||"#1B2A6B";
+    return (
+      <div style={{background:"#FFFFFF",border:`2px solid ${rc}30`,borderRadius:10,overflow:"hidden",width:compact?150:180,boxShadow:"0 2px 6px rgba(0,0,0,.06)"}}>
+        <div style={{fontSize:12,fontWeight:700,color:"#fff",background:rc,padding:"3px 8px",textAlign:"center",letterSpacing:1}}>{roundLabels[round]||round}</div>
+        {[{t:match.home,s:match.homeScore,f:ht.flag,win:match.homeScore!=null&&match.homeScore>match.awayScore},
+          {t:match.away,s:match.awayScore,f:at.flag,win:match.awayScore!=null&&match.awayScore>match.homeScore}].map((r,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"5px 8px",
+            borderTop:i?"1px solid #F3F4F6":"none",background:r.win?`${rc}08`:"transparent"}}>
+            <div style={{display:"flex",alignItems:"center",gap:4,flex:1,minWidth:0}}>
+              <span style={{fontSize:13}}>{r.f}</span>
+              <span style={{fontSize:12,fontWeight:r.win?700:500,color:r.t==="TBD"?"#9CA3AF":"#1F2937",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.t}</span>
+            </div>
+            <span style={{fontFamily:fb,fontSize:16,color:r.win?rc:"#1B2A6B",minWidth:18,textAlign:"center"}}>{r.s!=null?r.s:"–"}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const Connector = ({h,color}) => (
+    <div style={{display:"flex",alignItems:"center",flex:"none",width:16}}>
+      <svg width="16" height={h} style={{overflow:"visible"}}>
+        <path d={`M0,${h*0.25}L8,${h*0.25}L8,${h*0.75}L0,${h*0.75}`} fill="none" stroke={color||"#D1D5DB"} strokeWidth="2"/>
+        <path d={`M8,${h*0.5}L16,${h*0.5}`} fill="none" stroke={color||"#D1D5DB"} strokeWidth="2"/>
+      </svg>
+    </div>
+  );
+
+  const RoundCol = ({matches, round, compact}) => (
+    <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:compact?6:10,alignItems:"center",flex:"none"}}>
+      {matches.map(m=><MatchCard key={m.id} match={m} round={round} compact={compact}/>)}
+    </div>
+  );
+
+  if(mobile) {
+    return (<div>
+      <div style={{display:"flex",gap:6,marginBottom:16}}>
+        {[{id:"r32",l:"Octavos"},{id:"bracket",l:"Cuadro Final"}].map(v=>(
+          <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:700,
+            background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
+        ))}
+      </div>
+      {koView==="r32" ? (
+        <div style={{display:"grid",gridTemplateColumns:"1fr",gap:8}}>
+          {ko.r32.map(m=><MatchCard key={m.id} match={m} round="r32" compact/>)}
+        </div>
+      ) : (
+        <div>
+          {[{r:"r16",m:ko.r16},{r:"qf",m:ko.qf},{r:"sf",m:ko.sf},{r:"third",m:ko.third},{r:"final",m:ko.final}].map(({r,m})=>(
+            <div key={r} style={{marginBottom:16}}>
+              <div style={{fontFamily:fb,fontSize:16,letterSpacing:2,color:roundColors[r],marginBottom:6}}>{(roundLabels[r]||r).toUpperCase()}</div>
+              <div style={{display:"grid",gridTemplateColumns:m.length>2?"1fr 1fr":"1fr",gap:8}}>
+                {m.map(match=><MatchCard key={match.id} match={match} round={r} compact/>)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>);
+  }
+
+  // Desktop: R32 as grid, R16+ as bracket
+  return (<div>
+    <div style={{display:"flex",gap:6,marginBottom:16}}>
+      {[{id:"r32",l:"Octavos de Final (16 partidos)"},{id:"bracket",l:"Cuadro Final (R16 → Final)"}].map(v=>(
+        <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
+          background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
+      ))}
+    </div>
+
+    {koView==="r32" ? (
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
+        {ko.r32.map(m=><MatchCard key={m.id} match={m} round="r32"/>)}
+      </div>
+    ) : (
+      <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"20px 0"}}>
+        {/* Left: R16(4) → QF(2) → SF(1) */}
+        <RoundCol matches={ko.r16.slice(0,4)} round="r16"/>
+        <Connector h={140} color="#C8102E50"/>
+        <RoundCol matches={ko.qf.slice(0,2)} round="qf"/>
+        <Connector h={280} color="#009B3A50"/>
+        <RoundCol matches={ko.sf.slice(0,1)} round="sf"/>
+
+        {/* Center: Final + 3rd */}
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 20px",gap:12}}>
+          <div style={{fontFamily:fb,fontSize:24,letterSpacing:3,color:"#D4A843"}}>🏆 FINAL</div>
+          <MatchCard match={ko.final[0]} round="final"/>
+          <div style={{width:60,height:2,background:"#E5E7EB",margin:"8px 0"}}/>
+          <MatchCard match={ko.third[0]} round="third" compact/>
+        </div>
+
+        {/* Right: SF(1) → QF(2) → R16(4) */}
+        <RoundCol matches={ko.sf.slice(1)} round="sf"/>
+        <Connector h={280} color="#009B3A50"/>
+        <RoundCol matches={ko.qf.slice(2)} round="qf"/>
+        <Connector h={140} color="#C8102E50"/>
+        <RoundCol matches={ko.r16.slice(4)} round="r16"/>
+      </div>
+    )}
+  </div>);
+}
+
 function FixturesPage({fixtures, onSelect}) {
   const t=_t;
   const mobile=useIsMobile();
+  const [phase, setPhase] = useState("groups");
   const [gf, setGf] = useState("ALL");
   const list = gf==="ALL" ? fixtures : fixtures.filter(f=>f.group===gf);
   return (<div style={{padding:"20px 0"}}>
+    {/* Phase toggle */}
+    <div style={{display:"flex",gap:8,marginBottom:16}}>
+      {[{id:"groups",label:"Fase de Grupos"},{id:"knockout",label:"Eliminatorias"}].map(p=>(
+        <button key={p.id} onClick={()=>setPhase(p.id)} style={{
+          padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
+          background:phase===p.id?"#1B2A6B":"#FFFFFF",color:phase===p.id?"#FFFFFF":"#4B5563",
+          boxShadow:phase===p.id?"none":"0 1px 3px rgba(0,0,0,.08)",
+        }}>{p.label}</button>
+      ))}
+    </div>
+
+    {phase==="knockout" ? <KnockoutBracket mobile={mobile}/> : <>
     <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:20}}>
       <button style={{...fbtn(gf==="ALL")}} onClick={()=>setGf("ALL")}>{t.all}</button>
       {Object.keys(GROUPS).map(g=><button key={g} style={fbtn(gf===g)} onClick={()=>setGf(g)}>{g}</button>)}
@@ -860,6 +997,7 @@ function FixturesPage({fixtures, onSelect}) {
         </div>);
       })}
     </div>
+    </>}
   </div>);
 }
 
