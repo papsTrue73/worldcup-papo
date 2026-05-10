@@ -2137,6 +2137,23 @@ export default function App() {
         </div>
       </div>
 
+      {/* ─── STATUS BAR ─── */}
+      <div style={{background:"#FFFFFF",borderBottom:"1px solid #E5E7EB",padding:"6px 24px",display:"flex",alignItems:"center",justifyContent:"center",gap:mobile?12:24}}>
+        {[
+          {label:"Marcadores",key:ENV_FOOTBALL_KEY,icon:"⚽"},
+          {label:"Predicciones AI",key:ENV_BSD_KEY,icon:"🤖"},
+          {label:"Google Sheets",key:ENV_SHEET_ID,icon:"📊"},
+        ].map(s=>{
+          const configured = !!s.key;
+          return (
+            <div key={s.label} style={{display:"flex",alignItems:"center",gap:6}}>
+              <div style={{width:8,height:8,borderRadius:4,background:configured?"#10b981":"#D1D5DB"}}/>
+              <span style={{fontSize:12,fontWeight:600,color:configured?"#10b981":"#9CA3AF"}}>{mobile?s.icon:`${s.icon} ${s.label}`}</span>
+            </div>
+          );
+        })}
+      </div>
+
       {/* ─── CONTENT ─── */}
       <div style={{maxWidth:1280,margin:"0 auto",padding:mobile?"0 12px":"0"}}>
         {page==="home" && <HomePage fixtures={fixtures} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedMatch={liveSelected} setSelectedMatch={setSelectedMatch} onEdit={setEditMatch}/>}
