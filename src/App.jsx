@@ -6,9 +6,9 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 // Environment variables — injected by Vite's define config at build time
 // Falls back silently in non-Vite environments (artifact sandbox, etc.)
 let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_ID="",ENV_SHEET_URL="";
-try{ENV_FOOTBALL_KEY=__FOOTBALL_KEY__}catch(e){}
-try{ENV_BSD_KEY=__BSD_KEY__}catch(e){}
-try{ENV_SHEET_ID=__SHEET_ID__}catch(e){}
+try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
+try{ENV_BSD_KEY=WCENV_BSD}catch(e){}
+try{ENV_SHEET_ID=WCENV_SHEET}catch(e){}
 if(ENV_SHEET_ID)ENV_SHEET_URL=`https://docs.google.com/spreadsheets/d/${ENV_SHEET_ID}/edit`;
 
 const LANG = {
