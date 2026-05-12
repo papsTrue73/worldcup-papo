@@ -2261,7 +2261,7 @@ export default function App() {
                 <span style={{fontSize:12,color:"rgba(255,255,255,.4)"}}>✎</span>
               </div>}
               {!userTeam && <button onClick={()=>setShowWelcome(true)} style={{padding:"4px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(255,255,255,.08)",color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>⚽ Elegir equipo</button>}
-              {userName && !mobile && <span style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,.5)"}}>Hola, {userName}</span>}
+              {userName && <span style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,.85)"}}>Hola, {userName} 👋</span>}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:mobile?8:16}}>
               <Countdown/>
