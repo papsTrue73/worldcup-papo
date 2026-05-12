@@ -5,6 +5,11 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 // ─────────────────────────────────────────────
 // Environment variables — injected by Vite's define config at build time
 // Falls back silently in non-Vite environments (artifact sandbox, etc.)
+// Proxy-aware API URLs (proxy only works in Vite dev server)
+const IS_DEV=typeof window!=="undefined"&&window.location.hostname==="localhost";
+const FOOTBALL_BASE=IS_DEV?"/api/football":"https://api.football-data.org";
+const BSD_BASE=IS_DEV?"/api/bsd":"https://sports.bzzoiro.com";
+
 let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_ID="",ENV_SHEET_URL="";
 try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
 try{ENV_BSD_KEY=WCENV_BSD}catch(e){}
@@ -401,6 +406,9 @@ const DEMO_PLAYERS = [
   {name:"Papo_Fam",group:"family",champion:"Argentina",goldenBoot:"Messi",
     groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
     matches:{0:{r:"W",h:2,a:1},1:{r:"D",h:1,a:1},2:{r:"W",h:2,a:0},3:{r:"W",h:2,a:0}}},
+  {name:"Sebas",group:"family",champion:"Brazil",goldenBoot:"Vinícius Jr.",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Japan",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:2,a:0},1:{r:"D",h:1,a:1},2:{r:"W",h:1,a:0},3:{r:"D",h:0,a:0}}},
 ];
 
 // ─────────────────────────────────────────────
@@ -1408,7 +1416,7 @@ function AIPredsPage() {
     if(!bsdKey.trim()){setBsdMsg({ok:false,msg:t.apiKeyFirst || "Ingresa la API key"});return}
     setBsdLoading(true); setBsdMsg(null);
     try {
-      const res = await fetch("https://sports.bzzoiro.com/api/events/?competition=world-cup",{
+      const res = await fetch(`${BSD_BASE}/api/events/?competition=world-cup`,{
         headers:{"Authorization":`Token ${bsdKey.trim()}`}
       });
       if(!res.ok) throw new Error(`HTTP ${res.status} — Verifica tu API key`);
@@ -1841,7 +1849,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!apiKey.trim()){setStatus({ok:false,msg:"Pega tu API key de football-data.org"});return}
     setLoading(true); setStatus(null);
     try {
-      const res = await fetch("https://api.football-data.org/v4/competitions/WC/matches?season=2026",{
+      const res = await fetch(`${FOOTBALL_BASE}/v4/competitions/WC/matches?season=2026`,{
         headers:{"X-Auth-Token":apiKey.trim()}
       });
       if(!res.ok){
@@ -1901,7 +1909,7 @@ function FetchPanel({fixtures, onUpdate}) {
     for(let i=0; i<matchesWithApi.length && i<9; i++){
       const m = matchesWithApi[i];
       try {
-        const res = await fetch(`https://api.football-data.org/v4/matches/${m._apiMatchId}`,{
+        const res = await fetch(`${FOOTBALL_BASE}/v4/matches/${m._apiMatchId}`,{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
         if(!res.ok) continue;
@@ -1968,7 +1976,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!autoRefresh || !apiKey.trim()) return;
     const id = setInterval(async () => {
       try {
-        const res = await fetch("https://api.football-data.org/v4/competitions/WC/matches?season=2026",{
+        const res = await fetch(`${FOOTBALL_BASE}/v4/competitions/WC/matches?season=2026`,{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
         if(!res.ok) return;
@@ -2018,12 +2026,118 @@ function FetchPanel({fixtures, onUpdate}) {
 // ─────────────────────────────────────────────
 //  MAIN APP
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+//  USER PREFERENCES (localStorage)
+// ─────────────────────────────────────────────
+function loadPref(key, fallback) {
+  try { const v = localStorage.getItem("wc26_"+key); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; }
+}
+function savePref(key, val) {
+  try { localStorage.setItem("wc26_"+key, JSON.stringify(val)); } catch(e) {}
+}
+
+// ─────────────────────────────────────────────
+//  WELCOME SCREEN
+// ─────────────────────────────────────────────
+function WelcomeScreen({onComplete, players}) {
+  const [step, setStep] = useState(1);
+  const [selTeam, setSelTeam] = useState(null);
+  const [selName, setSelName] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const filteredTeams = search
+    ? ALL_TEAMS.filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
+    : ALL_TEAMS;
+
+  const finish = () => {
+    if(selTeam) savePref("team", selTeam);
+    if(selName) savePref("name", selName);
+    savePref("onboarded", true);
+    onComplete({team: selTeam, name: selName});
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:9999,background:"linear-gradient(145deg,#1B2A6B 0%,#243A8E 50%,#1B2A6B 100%)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+      <div style={{maxWidth:520,width:"100%",textAlign:"center"}}>
+        {/* Logo */}
+        <div style={{fontSize:64,marginBottom:8}}>⚽</div>
+        <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:4}}>Zona Mundialista 2026</div>
+        <div style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:32}}>Tu centro personal del Mundial</div>
+
+        {step === 1 && (
+          <div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿A QUIÉN LE VAS?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>Escoge tu selección favorita</div>
+
+            {/* Search */}
+            <input
+              type="text" value={search} onChange={e=>setSearch(e.target.value)}
+              placeholder="Buscar equipo..."
+              style={{width:"100%",padding:"10px 16px",borderRadius:12,border:"2px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:14,fontFamily:ff,outline:"none",boxSizing:"border-box",marginBottom:16,textAlign:"center"}}
+            />
+
+            {/* Team grid */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,maxHeight:320,overflowY:"auto",padding:"4px 2px"}}>
+              {filteredTeams.map(t => (
+                <button key={t.name} onClick={()=>setSelTeam(t.name)} style={{
+                  padding:"10px 4px",borderRadius:12,border:selTeam===t.name?"2px solid #D4A843":"2px solid transparent",
+                  background:selTeam===t.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
+                  cursor:"pointer",textAlign:"center",transition:"all .15s",
+                }}>
+                  <div style={{fontSize:28}}>{t.flag}</div>
+                  <div style={{fontSize:11,fontWeight:600,color:selTeam===t.name?"#D4A843":"rgba(255,255,255,.8)",marginTop:4,lineHeight:1.2}}>{t.name}</div>
+                </button>
+              ))}
+            </div>
+
+            <button onClick={()=>setStep(2)} style={{
+              marginTop:20,padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
+              background:selTeam?"#D4A843":"rgba(255,255,255,.15)",color:selTeam?"#1B2A6B":"rgba(255,255,255,.4)",
+            }}>{selTeam ? "Siguiente →" : "Saltar →"}</button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿QUIÉN ERES?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>Escoge tu nombre para ver tu posición en la Polla</div>
+
+            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
+              {players.map(p => (
+                <button key={p.name+"_"+p.group} onClick={()=>setSelName(p.name)} style={{
+                  padding:"12px 8px",borderRadius:12,border:selName===p.name?"2px solid #D4A843":"2px solid transparent",
+                  background:selName===p.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
+                  cursor:"pointer",textAlign:"center",transition:"all .15s",
+                }}>
+                  <div style={{fontSize:14,fontWeight:600,color:selName===p.name?"#D4A843":"#FFFFFF"}}>{p.name}</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginTop:2}}>{p.group==="friends"?"Amigos":"Familia"}</div>
+                </button>
+              ))}
+            </div>
+
+            <div style={{display:"flex",gap:12,justifyContent:"center"}}>
+              <button onClick={()=>setStep(1)} style={{padding:"12px 24px",borderRadius:12,border:"1px solid rgba(255,255,255,.2)",background:"transparent",color:"rgba(255,255,255,.7)",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:600}}>← Atrás</button>
+              <button onClick={finish} style={{
+                padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
+                background:"#D4A843",color:"#1B2A6B",
+              }}>{selName ? `Entrar como ${selName}` : "Entrar sin nombre"}</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [lang, setLang] = useState("es");
   const t=LANG[lang]||LANG.es;
   _t=t;
   const mobile = useIsMobile();
   const [appReady, setAppReady] = useState(false);
+  const [userTeam, setUserTeam] = useState(()=>loadPref("team",null));
+  const [userName, setUserName] = useState(()=>loadPref("name",null));
+  const [showWelcome, setShowWelcome] = useState(()=>!loadPref("onboarded",false));
   const [fixtures, setFixtures] = useState(initFixtures);
   const [page, setPage] = useState("home");
   const [selectedDate, setSelectedDate] = useState("Jun 11");
@@ -2083,6 +2197,11 @@ export default function App() {
   // Keep selectedMatch in sync with fixtures
   const liveSelected = selectedMatch ? fixtures.find(f=>f.id===selectedMatch.id) : null;
 
+  if(showWelcome) return <WelcomeScreen
+    players={DEMO_PLAYERS}
+    onComplete={({team,name})=>{setUserTeam(team);setUserName(name);setShowWelcome(false);}}
+  />;
+
   if(!appReady) return (
     <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#1F2937"}}>
       <div style={{fontSize:72,marginBottom:16}}>⚽</div>
@@ -2098,8 +2217,18 @@ export default function App() {
         <div style={{maxWidth:1280,margin:"0 auto",padding:mobile?"0":"0"}}>
           {/* Row 1: Title + Countdown + Stats + Lang */}
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:mobile?8:12,marginBottom:mobile?8:12}}>
-            <div style={{fontFamily:fb,fontSize:mobile?22:32,letterSpacing:mobile?2:3,lineHeight:1,color:"#FFFFFF"}}>
-              Zona Mundialista 2026
+            <div style={{display:"flex",alignItems:"center",gap:12}}>
+              <div style={{fontFamily:fb,fontSize:mobile?22:32,letterSpacing:mobile?2:3,lineHeight:1,color:"#FFFFFF"}}>
+                Zona Mundialista 2026
+              </div>
+              {userTeam && <div onClick={()=>setShowWelcome(true)} title="Cambiar equipo o nombre" style={{display:"flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:8,background:"rgba(255,255,255,.12)",cursor:"pointer",transition:"background .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.2)"} onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,.12)"}>
+                <span style={{fontSize:mobile?18:22}}>{team(userTeam).flag}</span>
+                {!mobile && <span style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)"}}>{userTeam}</span>}
+                <span style={{fontSize:12,color:"rgba(255,255,255,.4)"}}>✎</span>
+              </div>}
+              {!userTeam && <button onClick={()=>setShowWelcome(true)} style={{padding:"4px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(255,255,255,.08)",color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>⚽ Elegir equipo</button>}
+              {userName && !mobile && <span style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,.5)"}}>Hola, {userName}</span>}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:mobile?8:16}}>
               <Countdown/>
@@ -2156,6 +2285,39 @@ export default function App() {
 
       {/* ─── CONTENT ─── */}
       <div style={{maxWidth:1280,margin:"0 auto",padding:mobile?"0 12px":"0"}}>
+        {/* Personal card on home page */}
+        {page==="home" && (userName || userTeam) && (() => {
+          const ut = userTeam ? team(userTeam) : null;
+          const myTeamMatches = userTeam ? fixtures.filter(f=>f.home===userTeam||f.away===userTeam) : [];
+          const nextMatch = myTeamMatches.find(f=>f.status==="upcoming");
+          const pollaPlayer = DEMO_PLAYERS.find(p=>p.name===userName);
+          const pollaRank = pollaPlayer ? (() => {
+            const grp = DEMO_PLAYERS.filter(p=>p.group===pollaPlayer.group);
+            const ranked = grp.map(p=>({name:p.name,total:calcPts(p,fixtures).total})).sort((a,b)=>b.total-a.total);
+            const pos = ranked.findIndex(r=>r.name===userName)+1;
+            return {pos, total:ranked.find(r=>r.name===userName)?.total||0, of:grp.length};
+          })() : null;
+          return (
+            <div style={{display:"flex",gap:12,padding:"16px 0",flexWrap:"wrap"}}>
+              {ut && nextMatch && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
+                <span style={{fontSize:32}}>{ut.flag}</span>
+                <div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>PRÓXIMO PARTIDO</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{nextMatch.home} vs {nextMatch.away}</div>
+                  <div style={{fontSize:12,color:"#6B7280"}}>{nextMatch.date} · {nextMatch.time}</div>
+                </div>
+              </div>}
+              {pollaRank && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
+                <div style={{fontFamily:fb,fontSize:36,color:"#D4A843"}}>{pollaRank.pos}°</div>
+                <div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>TU POSICIÓN EN LA POLLA</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{pollaRank.total} puntos</div>
+                  <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends"?"Amigos":"Familia"}</div>
+                </div>
+              </div>}
+            </div>
+          );
+        })()}
         {page==="home" && <HomePage fixtures={fixtures} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedMatch={liveSelected} setSelectedMatch={setSelectedMatch} onEdit={setEditMatch}/>}
         {page==="fixtures" && <FixturesPage fixtures={fixtures} onSelect={handleFixtureSelect}/>}
         {page==="stats" && <StatsPage fixtures={fixtures}/>}
@@ -2165,7 +2327,11 @@ export default function App() {
 
       {/* ─── EDIT MODAL ─── */}
       {editMatch && <EditModal match={editMatch} onSave={handleSave} onClose={()=>setEditMatch(null)}/>}
-      <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>Creado por JPTDesign</div>
+      <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>
+        Creado por JPTDesign
+        <span style={{margin:"0 8px"}}>·</span>
+        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>Cambiar equipo</button>
+      </div>
     </div>
   );
 }
