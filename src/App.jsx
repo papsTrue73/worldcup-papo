@@ -7,8 +7,8 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 // Falls back silently in non-Vite environments (artifact sandbox, etc.)
 // Proxy-aware API URLs (proxy only works in Vite dev server)
 const IS_DEV=typeof window!=="undefined"&&window.location.hostname==="localhost";
-const FOOTBALL_BASE=IS_DEV?"/api/football":"https://api.football-data.org";
-const BSD_BASE=IS_DEV?"/api/bsd":"https://sports.bzzoiro.com";
+const FOOTBALL_URL=(path)=>IS_DEV?`/api/football${path}`:`/api/football?path=${encodeURIComponent(path)}`;
+const BSD_URL=(path)=>IS_DEV?`/api/bsd${path}`:`/api/bsd?path=${encodeURIComponent(path)}`;
 
 let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_ID="",ENV_SHEET_URL="";
 try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
@@ -1447,7 +1447,7 @@ function AIPredsPage() {
     if(!bsdKey.trim()){setBsdMsg({ok:false,msg:t.apiKeyFirst || "Ingresa la API key"});return}
     setBsdLoading(true); setBsdMsg(null);
     try {
-      const res = await fetch(`${BSD_BASE}/api/events/?competition=world-cup`,{
+      const res = await fetch(BSD_URL("/api/events/?competition=world-cup"),{
         headers:{"Authorization":`Token ${bsdKey.trim()}`}
       });
       if(!res.ok) throw new Error(`HTTP ${res.status} — Verifica tu API key`);
@@ -1882,7 +1882,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!apiKey.trim()){setStatus({ok:false,msg:"Pega tu API key de football-data.org"});return}
     setLoading(true); setStatus(null);
     try {
-      const res = await fetch(`${FOOTBALL_BASE}/v4/competitions/WC/matches?season=2026`,{
+      const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches?season=2026"),{
         headers:{"X-Auth-Token":apiKey.trim()}
       });
       if(!res.ok){
@@ -1942,7 +1942,7 @@ function FetchPanel({fixtures, onUpdate}) {
     for(let i=0; i<matchesWithApi.length && i<9; i++){
       const m = matchesWithApi[i];
       try {
-        const res = await fetch(`${FOOTBALL_BASE}/v4/matches/${m._apiMatchId}`,{
+        const res = await fetch(FOOTBALL_URL(`/v4/matches/${m._apiMatchId}`),{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
         if(!res.ok) continue;
@@ -2009,7 +2009,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!autoRefresh || !apiKey.trim()) return;
     const id = setInterval(async () => {
       try {
-        const res = await fetch(`${FOOTBALL_BASE}/v4/competitions/WC/matches?season=2026`,{
+        const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches?season=2026"),{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
         if(!res.ok) return;
