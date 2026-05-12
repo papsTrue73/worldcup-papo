@@ -2057,8 +2057,8 @@ function WelcomeScreen({onComplete, players}) {
   };
 
   return (
-    <div style={{position:"fixed",inset:0,zIndex:9999,background:"linear-gradient(145deg,#1B2A6B 0%,#243A8E 50%,#1B2A6B 100%)",display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <div style={{maxWidth:520,width:"100%",textAlign:"center"}}>
+    <div style={{position:"fixed",inset:0,zIndex:9999,background:"linear-gradient(145deg,#1B2A6B 0%,#243A8E 50%,#1B2A6B 100%)",overflowY:"auto",WebkitOverflowScrolling:"touch",padding:20,display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
+      <div style={{maxWidth:520,width:"100%",textAlign:"center",paddingTop:40,paddingBottom:40}}>
         {/* Logo */}
         <div style={{fontSize:64,marginBottom:8}}>⚽</div>
         <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:4}}>Zona Mundialista 2026</div>
