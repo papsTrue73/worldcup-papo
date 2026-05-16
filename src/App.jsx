@@ -1603,7 +1603,10 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     }
   }, [autoLoaded, sheetConnected, uploaded.length]);
 
-  const all=[...(showDemo?DEMO_PLAYERS:[]),...uploaded];
+  // Merge: use sheet data where available, demo data for groups without sheets
+  const uploadedGroups = new Set(uploaded.map(p=>p.group));
+  const demoFiltered = showDemo ? DEMO_PLAYERS.filter(p=>!uploadedGroups.has(p.group)) : [];
+  const all=[...demoFiltered,...uploaded];
   const fri=all.filter(p=>p.group==="friends_usa");
   const co=all.filter(p=>p.group==="friends_co");
   const fam=all.filter(p=>p.group==="family");
@@ -1707,6 +1710,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
       setUploaded(allPlayers);
       setSheetConnected(true);
+      setShowDemo(false);
       const matchCount = allPlayers.reduce((s,p)=>s+Object.keys(p.matches).length, 0);
       const groups = [...new Set(allPlayers.map(p=>p.group))];
       setImportMsg({ok:true, msg:`✓ ${allPlayers.length} jugadores · ${matchCount} predicciones · ${groups.length} grupo(s)`});
