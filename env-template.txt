@@ -1,0 +1,10 @@
+# football-data.org (marcadores en vivo)
+VITE_FOOTBALL_API_KEY=
+
+# Bzzoiro Sports Data (predicciones AI)
+VITE_BSD_API_KEY=
+
+# Google Sheet IDs — Polla Mundialista (one per group)
+VITE_SHEET_AMIGOS_USA=
+VITE_SHEET_FAMILIA=
+VITE_SHEET_AMIGOS_CO=

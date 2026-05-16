@@ -8,7 +8,9 @@ export default defineConfig(({ mode }) => {
     define: {
       WCENV_FOOTBALL: JSON.stringify(env.VITE_FOOTBALL_API_KEY || ""),
       WCENV_BSD: JSON.stringify(env.VITE_BSD_API_KEY || ""),
-      WCENV_SHEET: JSON.stringify(env.VITE_GOOGLE_SHEET_ID || ""),
+      WCENV_SHEET_USA: JSON.stringify(env.VITE_SHEET_AMIGOS_USA || ""),
+      WCENV_SHEET_FAM: JSON.stringify(env.VITE_SHEET_FAMILIA || ""),
+      WCENV_SHEET_CO: JSON.stringify(env.VITE_SHEET_AMIGOS_CO || ""),
     },
     server: {
       proxy: {
