@@ -33,7 +33,7 @@ const LANG = {
     matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
     finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
     // Nav
-    navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones", navPolla: "Bracket",
+    navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones", navPolla: "Polla",
     // Status
     statusFt: "Final", statusLive: "En Vivo", statusUpcoming: "Próximo",
     // Home
@@ -101,7 +101,7 @@ const LANG = {
     pj: "PJ", g: "G", e: "E", p: "P", gf: "GF", gc: "GC", dg: "DG",
     pts: "Pts", avgPoss: "Pos. Prom.", cleanSheet: "Valla Inv.",
     // Polla
-    pollaTitle: "WORLD CUP BRACKET",
+    pollaTitle: "POLLA MUNDIALISTA",
     pollaDesc: "Resultado correcto (V/E/D) = 3 pts · Marcador exacto = +5 pts · Ganador grupo = 5 pts · Campeón = 15 pts · Bota de Oro = 10 pts",
     importPlayers: "Importar jugadores",
     importDesc: "Pega datos JSON de los participantes. Usa el convertidor de Excel para generar el JSON desde los archivos .xlsx",
@@ -120,48 +120,17 @@ const LANG = {
     evGoal: "Gol", evPenalty: "Penal", evOwnGoal: "Autogol",
     evFreeKick: "Tiro Libre", evHeader: "Cabezazo", evFoul: "Falta",
     evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
-
-    // Knockout
-    groupStage: "Fase de Grupos", knockoutStage: "Eliminatorias",
-    r32Label: "Octavos de Final (16 partidos)", bracketLabel: "Cuadro Final (R16 → Final)",
-    r32Short: "Octavos", bracketShort: "Cuadro Final",
-    roundR32: "Octavos", roundR16: "Cuartos", roundQF: "Semifinal", roundSF: "Semifinal",
-    roundFinal: "Final", roundThird: "3er Puesto",
-    // Welcome
-    welcomeTitle: "¿A QUIÉN LE VAS?",
-    welcomeQ1: "¿A QUIÉN LE VAS?", welcomeQ1Sub: "Escoge tu selección favorita",
-    welcomeQ2: "¿QUIÉN ERES?", welcomeQ2Sub: "Escoge tu nombre para ver tu posición en la Polla",
-    welcomeSearch: "Buscar equipo...", welcomeNext: "Siguiente →", welcomeSkip: "Saltar →",
-    welcomeBack: "← Atrás", welcomeEnterAs: "Entrar como", welcomeEnterNoName: "Entrar sin nombre",
-    // Status
-    apiConnectedLabel: "API Conectada", apiWaiting: "Esperando datos", apiNoKey: "Sin API key",
-    apiLoading: "Conectando...", apiRefresh: t.apiRefresh, apiAuto: "Auto 60s",
-    // Home personal
-    nextMatch: "{t.nextMatch}", yourPosition: "{t.yourPosition}",
-    posOf: "de", posIn: "en",
-    // Polla filters
-    pollaAll: "Todos", pollaUSA: "Amigos USA", pollaCO: "Amigos Colombia", pollaFam: "Familia",
-    connectingSheets: "Conectando con Google Sheets...",
-    noPredictions: "Sin predicciones disponibles.",
-    loadingPreds: "Cargando predicciones...",
-    // Countdown
-    daysToWC: "días para\nel Mundial", wcLive: "⚽ EN VIVO",
-    // Footer
-    changeTeam: "Cambiar equipo", pickTeam: "⚽ Elegir equipo",
-    // AI page
-    aiDesc: "Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data.",
-    aiDraw: "Empate",
   },
   en: {
     brandSub: "Zona Mundialista",
-    brandTitle: "WorldCup Zone 2026",
+    brandTitle: "Zona Mundialista 2026",
     brandDesc: "Four connected views: Today's Games, Fixture Map, Statistics Center and Prediction Game.",
     dataMode: "Data mode:",
     apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
     simulate: "Simulate API refresh", reset: "Reset data",
     matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
-    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Bracket",
+    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Polla",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
     todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
     todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
@@ -217,7 +186,7 @@ const LANG = {
     opponent: "Opponent", result: "Result",
     pj: "MP", g: "W", e: "D", p: "L", gf: "GF", gc: "GA", dg: "GD",
     pts: "Pts", avgPoss: "Avg Poss.", cleanSheet: "Clean Sh.",
-    pollaTitle: "WORLD CUP BRACKET",
+    pollaTitle: "POLLA MUNDIALISTA",
     pollaDesc: "Correct result (W/D/L) = 3 pts · Exact score = +5 pts · Group winner = 5 pts · Champion = 15 pts · Golden Boot = 10 pts",
     importPlayers: "Import players",
     importDesc: "Paste JSON data from participants. Use the Excel converter to generate JSON from .xlsx files",
@@ -235,36 +204,6 @@ const LANG = {
     evGoal: "Goal", evPenalty: "Penalty", evOwnGoal: "Own Goal",
     evFreeKick: "Free Kick", evHeader: "Header", evFoul: "Foul",
     evYellow: "Yellow Card", evRed: "Red Card",
-    // Knockout
-    groupStage: "Group Stage", knockoutStage: "Knockout Stage",
-    r32Label: "Round of 32 (16 matches)", bracketLabel: "Final Bracket (R16 → Final)",
-    r32Short: "Round of 32", bracketShort: "Final Bracket",
-    roundR32: "R32", roundR16: "R16", roundQF: "Quarterfinal", roundSF: "Semifinal",
-    roundFinal: "Final", roundThird: "3rd Place",
-    // Welcome
-    welcomeTitle: "WHO ARE YOU ROOTING FOR?",
-    welcomeQ1: "WHO ARE YOU ROOTING FOR?", welcomeQ1Sub: "Pick your favorite team",
-    welcomeQ2: "WHO ARE YOU?", welcomeQ2Sub: "Pick your name to see your Bracket ranking",
-    welcomeSearch: "Search team...", welcomeNext: "Next →", welcomeSkip: "Skip →",
-    welcomeBack: "← Back", welcomeEnterAs: "Enter as", welcomeEnterNoName: "Enter without name",
-    // Status
-    apiConnectedLabel: "API Connected", apiWaiting: "Waiting for data", apiNoKey: "No API key",
-    apiLoading: "Connecting...", apiRefresh: "↻ Refresh", apiAuto: "Auto 60s",
-    // Home personal
-    nextMatch: "NEXT MATCH", yourPosition: "YOUR BRACKET POSITION",
-    posOf: "of", posIn: "in",
-    // Polla filters
-    pollaAll: "All", pollaUSA: "Friends USA", pollaCO: "Friends Colombia", pollaFam: "Family",
-    connectingSheets: "Connecting to Google Sheets...",
-    noPredictions: "No predictions available.",
-    loadingPreds: "Loading predictions...",
-    // Countdown
-    daysToWC: "days to\nWorld Cup", wcLive: "⚽ LIVE",
-    // Footer
-    changeTeam: "Change team", pickTeam: "⚽ Pick team",
-    // AI page
-    aiDesc: "AI-generated predictions (CatBoost ML) powered by Bzzoiro Sports Data.",
-    aiDraw: "Draw",
   }
 };
 
@@ -538,7 +477,7 @@ function Countdown() {
   return (
     <div style={{display:"flex",alignItems:"center",gap:8}}>
       <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days}</span>
-      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}} dangerouslySetInnerHTML={{__html:_t.daysToWC.replace("\\n","<br/>")}}/>
+      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>días para<br/>el Mundial</span>
     </div>
   );
 }
@@ -677,7 +616,7 @@ function MatchDetail({match:m, onEdit}) {
 
       {/* Edit button */}
       <button onClick={()=>onEdit(m)} style={{
-        padding:"8px 18px",borderRadius:10,border:"1px solid rgba(0,0,0,.1)",cursor:"pointer",
+        padding:"8px 18px",borderRadius:10,cursor:"pointer",
         background:"#F3F4F6",border:"1px solid #E5E7EB",color:"#4B5563",fontSize:12,fontWeight:600,fontFamily:ff,
         marginBottom:24,transition:"all .15s",
       }}>{`✏️ ${t.editMatch}`}</button>
@@ -926,7 +865,7 @@ function KnockoutBracket({mobile}) {
   const [koView, setKoView] = useState("bracket");
 
   const roundColors = {r32:"#1B2A6B",r16:"#C8102E",qf:"#009B3A",sf:"#D4A843",final:"#1B2A6B",third:"#6B7280"};
-  const roundLabels = {r32:t.roundR32,r16:t.roundR16,qf:t.roundQF,sf:t.roundSF,final:t.roundFinal,third:t.roundThird};
+  const roundLabels = {r32:"Octavos",r16:"Cuartos",qf:"Semifinal",sf:"Semifinal",final:"Final",third:"3er Puesto"};
 
   const MatchCard = ({match, round, compact}) => {
     const ht=team(match.home), at=team(match.away);
@@ -967,7 +906,7 @@ function KnockoutBracket({mobile}) {
   if(mobile) {
     return (<div>
       <div style={{display:"flex",gap:6,marginBottom:16}}>
-        {[{id:"r32",l:t.r32Short},{id:"bracket",l:t.bracketShort}].map(v=>(
+        {[{id:"r32",l:"Octavos"},{id:"bracket",l:"Cuadro Final"}].map(v=>(
           <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:700,
             background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
         ))}
@@ -994,7 +933,7 @@ function KnockoutBracket({mobile}) {
   // Desktop: R32 as grid, R16+ as bracket
   return (<div>
     <div style={{display:"flex",gap:6,marginBottom:16}}>
-      {[{id:"r32",l:t.r32Label},{id:"bracket",l:t.bracketLabel}].map(v=>(
+      {[{id:"r32",l:"Octavos de Final (16 partidos)"},{id:"bracket",l:"Cuadro Final (R16 → Final)"}].map(v=>(
         <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
       ))}
@@ -1015,7 +954,7 @@ function KnockoutBracket({mobile}) {
 
         {/* Center: Final + 3rd */}
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 20px",gap:12}}>
-          <div style={{fontFamily:fb,fontSize:24,letterSpacing:3,color:"#D4A843"}}>🏆 {t.roundFinal.toUpperCase()}</div>
+          <div style={{fontFamily:fb,fontSize:24,letterSpacing:3,color:"#D4A843"}}>🏆 FINAL</div>
           <MatchCard match={ko.final[0]} round="final"/>
           <div style={{width:60,height:2,background:"#E5E7EB",margin:"8px 0"}}/>
           <MatchCard match={ko.third[0]} round="third" compact/>
@@ -1041,7 +980,7 @@ function FixturesPage({fixtures, onSelect}) {
   return (<div style={{padding:"20px 0"}}>
     {/* Phase toggle */}
     <div style={{display:"flex",gap:8,marginBottom:16}}>
-      {[{id:"groups",label:t.groupStage},{id:"knockout",label:t.knockoutStage}].map(p=>(
+      {[{id:"groups",label:"Fase de Grupos"},{id:"knockout",label:"Eliminatorias"}].map(p=>(
         <button key={p.id} onClick={()=>setPhase(p.id)} style={{
           padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:phase===p.id?"#1B2A6B":"#FFFFFF",color:phase===p.id?"#FFFFFF":"#4B5563",
@@ -1557,7 +1496,7 @@ function AIPredsPage() {
         {t.navAI || "PREDICCIONES AI"}
       </div>
       <div style={{fontSize:13,color:"#6B7280",marginBottom:12}}>
-        {t.aiDesc}
+        Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data. Probabilidades de victoria, empate, goles y cuotas de múltiples casas de apuestas.
       </div>
       {bsdMsg && <div style={{marginBottom:16,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
         background:bsdMsg.ok?"#10b98110":"#ef444410",color:bsdMsg.ok?"#10b981":"#ef4444"}}>
@@ -1600,7 +1539,7 @@ function AIPredsPage() {
                 {/* Probability bars */}
                 <div style={{padding:"0 16px 12px",display:"flex",gap:12}}>
                   <ProbBar label={p.home} pct={p.homeWin} color={p.homeWin===maxProb?"#1B2A6B":"#9CA3AF"}/>
-                  <ProbBar label={t.aiDraw} pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
+                  <ProbBar label="Empate" pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
                   <ProbBar label={p.away} pct={p.awayWin} color={p.awayWin===maxProb?"#C8102E":"#9CA3AF"}/>
                 </div>
                 {/* Odds + markets */}
@@ -1746,16 +1685,16 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
   const fetchFromGoogleSheets = useCallback(async () => {
     setLoading(true);
-    setImportMsg({ ok: true, msg: t.connectingSheets });
+    setImportMsg({ok:true, msg:"Conectando con Google Sheets..."});
     try {
       const allPlayers = [];
 
       // Fetch each group's master sheet
       const sheets = [
-  {id:getSheetId(ENV_SHEET_USA), group:"friends_usa", label:"Amigos USA"},
-  {id:getSheetId(ENV_SHEET_FAM), group:"family", label:"Familia"},
-  {id:getSheetId(ENV_SHEET_CO), group:"friends_co", label:"Amigos Colombia"},
-];
+        {id:ENV_SHEET_USA, group:"friends_usa", label:"Amigos USA"},
+        {id:ENV_SHEET_FAM, group:"family", label:"Familia"},
+        {id:ENV_SHEET_CO, group:"friends_co", label:"Amigos Colombia"},
+      ];
 
       for(const sheet of sheets){
         if(!sheet.id) continue;
@@ -1880,11 +1819,11 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
         background:importMsg.ok?"#10b98110":"#ef444410",color:importMsg.ok?"#10b981":"#ef4444"}}>
         {sheetConnected && <span style={{width:6,height:6,borderRadius:3,background:"#10b981"}}/>}{importMsg.msg}
       </div>
-      {sheetConnected && <button onClick={fetchFromGoogleSheets} disabled={loading} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #E5E7EB",background:"#FFFFFF",color:"#4B5563",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>{t.apiRefresh}</button>}
+      {sheetConnected && <button onClick={fetchFromGoogleSheets} disabled={loading} style={{padding:"6px 14px",borderRadius:8,border:"1px solid #E5E7EB",background:"#FFFFFF",color:"#4B5563",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>↻ Actualizar</button>}
     </div>}
     {/* Filters */}
     <div style={{display:"flex",gap:6,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
-      {[{id:"all",l:t.pollaAll},{id:"friends_usa",l:t.pollaUSA},{id:"friends_co",l:t.pollaCO},{id:"family",l:t.pollaFam}].map(f=>(
+      {[{id:"all",l:"Todos"},{id:"friends_usa",l:"Amigos USA"},{id:"friends_co",l:"Amigos Colombia"},{id:"family",l:"Familia"}].map(f=>(
         <button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:8,border:"1px solid rgba(0,0,0,.08)",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:ff,background:filter===f.id?"#1B2A6B":"#FFFFFF",color:filter===f.id?"#FFFFFF":"#4B5563"}}>{f.l}</button>))}
       <label style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:12,color:"#4B5563"}}>
         <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> {t.showDemo}</label>
@@ -2075,12 +2014,12 @@ function FetchPanel({fixtures, onUpdate}) {
     <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 16px",background:"rgba(255,255,255,.06)",borderRadius:10,marginBottom:12}}>
       <div style={{width:8,height:8,borderRadius:4,background:isConnected?"#10b981":hasKey?"#D4A843":"#6B7280"}}/>
       <span style={{fontSize:12,fontWeight:600,color:isConnected?"#10b981":hasKey?"#D4A843":"rgba(255,255,255,.5)"}}>
-        {isConnected?t.apiConnectedLabel:loading?t.apiLoading:hasKey?t.apiWaiting:t.apiNoKey}
+        {isConnected?"API Conectada":loading?"Conectando...":hasKey?"Esperando datos":"Sin API key"}
       </span>
       {status?.msg && <span style={{fontSize:12,color:"rgba(255,255,255,.5)"}}>{status.msg}</span>}
       <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
         {hasKey && <button onClick={fetchMatches} disabled={loading} style={{padding:"5px 12px",borderRadius:6,border:"1px solid rgba(255,255,255,.15)",background:"transparent",color:"#FFFFFF",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff,opacity:loading?.5:1}}>
-          {loading?"...":t.apiRefresh}
+          {loading?"...":"↻ Actualizar"}
         </button>}
         <label style={{display:"flex",alignItems:"center",gap:4,cursor:"pointer",fontSize:12,color:autoRefresh?"#10b981":"rgba(255,255,255,.4)",fontWeight:600}}>
           <input type="checkbox" checked={autoRefresh} onChange={e=>setAutoRefresh(e.target.checked)} style={{accentColor:"#10b981"}}/>
@@ -2107,8 +2046,7 @@ function savePref(key, val) {
 // ─────────────────────────────────────────────
 //  WELCOME SCREEN
 // ─────────────────────────────────────────────
-function WelcomeScreen({onComplete, players, lang, setLang}) {
-  const t=_t;
+function WelcomeScreen({onComplete, players}) {
   const [step, setStep] = useState(1);
   const [selTeam, setSelTeam] = useState(null);
   const [selName, setSelName] = useState(null);
@@ -2117,18 +2055,6 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
   const filteredTeams = search
     ? ALL_TEAMS.filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
     : ALL_TEAMS;
-
-  // Deduplicate players by name, merge group labels
-  const groupLabel = (g) => g==="friends_usa"?"Amigos USA":g==="friends_co"?"Amigos Colombia":"Familia";
-  const uniquePlayers = useMemo(() => {
-    const map = {};
-    players.forEach(p => {
-      if(!map[p.name]) map[p.name] = {name:p.name, groups:[]};
-      const gl = groupLabel(p.group);
-      if(!map[p.name].groups.includes(gl)) map[p.name].groups.push(gl);
-    });
-    return Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
-  }, [players]);
 
   const finish = () => {
     if(selTeam) savePref("team", selTeam);
@@ -2140,29 +2066,20 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
   return (
     <div style={{position:"fixed",inset:0,zIndex:9999,background:"linear-gradient(145deg,#1B2A6B 0%,#243A8E 50%,#1B2A6B 100%)",overflowY:"auto",WebkitOverflowScrolling:"touch",padding:20,display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
       <div style={{maxWidth:520,width:"100%",textAlign:"center",paddingTop:40,paddingBottom:40}}>
-        {/* Language toggle */}
-        <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:24}}>
-          {[{id:"es",label:"Español 🇪🇸"},{id:"en",label:"English 🇺🇸"}].map(l=>(
-            <button key={l.id} onClick={()=>setLang(l.id)} style={{
-              padding:"8px 20px",borderRadius:10,border:lang===l.id?"2px solid #D4A843":"2px solid rgba(255,255,255,.15)",
-              background:lang===l.id?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
-              color:lang===l.id?"#D4A843":"rgba(255,255,255,.7)",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:ff,
-            }}>{l.label}</button>
-          ))}
-        </div>
         {/* Logo */}
         <div style={{fontSize:64,marginBottom:8}}>⚽</div>
-        <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:32}}>{t.brandTitle}</div>
+        <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:4}}>Zona Mundialista 2026</div>
+        <div style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:32}}>Tu centro personal del Mundial</div>
 
         {step === 1 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ1}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>{t.welcomeQ1Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿A QUIÉN LE VAS?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>Escoge tu selección favorita</div>
 
             {/* Search */}
             <input
               type="text" value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder={t.welcomeSearch}
+              placeholder="Buscar equipo..."
               style={{width:"100%",padding:"10px 16px",borderRadius:12,border:"2px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:14,fontFamily:ff,outline:"none",boxSizing:"border-box",marginBottom:16,textAlign:"center"}}
             />
 
@@ -2183,34 +2100,34 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
             <button onClick={()=>setStep(2)} style={{
               marginTop:20,padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
               background:selTeam?"#D4A843":"rgba(255,255,255,.15)",color:selTeam?"#1B2A6B":"rgba(255,255,255,.4)",
-            }}>{selTeam ? t.welcomeNext : t.welcomeSkip}</button>
+            }}>{selTeam ? "Siguiente →" : "Saltar →"}</button>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ2}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>{t.welcomeQ2Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿QUIÉN ERES?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>Escoge tu nombre para ver tu posición en la Polla</div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
-              {uniquePlayers.map(p => (
-                <button key={p.name} onClick={()=>setSelName(p.name)} style={{
+              {players.map(p => (
+                <button key={p.name+"_"+p.group} onClick={()=>setSelName(p.name)} style={{
                   padding:"12px 8px",borderRadius:12,border:selName===p.name?"2px solid #D4A843":"2px solid transparent",
                   background:selName===p.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
                   cursor:"pointer",textAlign:"center",transition:"all .15s",
                 }}>
                   <div style={{fontSize:14,fontWeight:600,color:selName===p.name?"#D4A843":"#FFFFFF"}}>{p.name}</div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,.4)",marginTop:2}}>{p.groups.join(" · ")}</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginTop:2}}>{p.group==="friends_usa"?"Amigos USA":p.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </button>
               ))}
             </div>
 
             <div style={{display:"flex",gap:12,justifyContent:"center"}}>
-              <button onClick={()=>setStep(1)} style={{padding:"12px 24px",borderRadius:12,border:"1px solid rgba(255,255,255,.2)",background:"transparent",color:"rgba(255,255,255,.7)",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:600}}>{t.welcomeBack}</button>
+              <button onClick={()=>setStep(1)} style={{padding:"12px 24px",borderRadius:12,border:"1px solid rgba(255,255,255,.2)",background:"transparent",color:"rgba(255,255,255,.7)",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:600}}>← Atrás</button>
               <button onClick={finish} style={{
                 padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
                 background:"#D4A843",color:"#1B2A6B",
-              }}>{selName ? `${t.welcomeEnterAs} ${selName}` : t.welcomeEnterNoName}</button>
+              }}>{selName ? `Entrar como ${selName}` : "Entrar sin nombre"}</button>
             </div>
           </div>
         )}
@@ -2220,11 +2137,9 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
 }
 
 export default function App() {
-  const [lang, setLang] = useState(()=>loadPref("lang","es"));
+  const [lang, setLang] = useState("es");
   const t=LANG[lang]||LANG.es;
   _t=t;
-  // Save lang when it changes
-  useEffect(()=>{savePref("lang",lang)},[lang]);
   const mobile = useIsMobile();
   const [appReady, setAppReady] = useState(false);
   const [userTeam, setUserTeam] = useState(()=>loadPref("team",null));
@@ -2291,15 +2206,14 @@ export default function App() {
 
   if(showWelcome) return <WelcomeScreen
     players={DEMO_PLAYERS}
-    lang={lang} setLang={setLang}
     onComplete={({team,name})=>{setUserTeam(team);setUserName(name);setShowWelcome(false);}}
   />;
 
   if(!appReady) return (
     <div style={{fontFamily:ff,background:"#F5F6FA",minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",color:"#1F2937"}}>
       <div style={{fontSize:72,marginBottom:16}}>⚽</div>
-      <div style={{fontFamily:fb,fontSize:mobile?24:36,letterSpacing:3,color:"#1B2A6B",marginBottom:8}}>{t.brandTitle}</div>
-      <div style={{fontSize:14,color:"#6B7280"}}>{lang==="en"?"Loading...":"Cargando..."}</div>
+      <div style={{fontFamily:fb,fontSize:mobile?24:36,letterSpacing:3,color:"#1B2A6B",marginBottom:8}}>Zona Mundialista 2026</div>
+      <div style={{fontSize:14,color:"#6B7280"}}>Cargando...</div>
     </div>
   );
 
@@ -2312,16 +2226,16 @@ export default function App() {
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:mobile?8:12,marginBottom:mobile?8:12}}>
             <div style={{display:"flex",alignItems:"center",gap:12}}>
               <div style={{fontFamily:fb,fontSize:mobile?22:32,letterSpacing:mobile?2:3,lineHeight:1,color:"#FFFFFF"}}>
-                {t.brandTitle}
+                Zona Mundialista 2026
               </div>
-              {userTeam && <div onClick={()=>setShowWelcome(true)} title={t.changeTeam} style={{display:"flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:8,background:"rgba(255,255,255,.12)",cursor:"pointer",transition:"background .15s"}}
+              {userTeam && <div onClick={()=>setShowWelcome(true)} title="Cambiar equipo o nombre" style={{display:"flex",alignItems:"center",gap:6,padding:"4px 12px",borderRadius:8,background:"rgba(255,255,255,.12)",cursor:"pointer",transition:"background .15s"}}
                 onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.2)"} onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,.12)"}>
                 <span style={{fontSize:mobile?18:22}}>{team(userTeam).flag}</span>
                 {!mobile && <span style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,.8)"}}>{userTeam}</span>}
                 <span style={{fontSize:12,color:"rgba(255,255,255,.4)"}}>✎</span>
               </div>}
-              {!userTeam && <button onClick={()=>setShowWelcome(true)} style={{padding:"4px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(255,255,255,.08)",color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>{t.pickTeam}</button>}
-              {userName && <span style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,.85)"}}>{lang==="en"?"Hi":"Hola"}, {userName} 👋</span>}
+              {!userTeam && <button onClick={()=>setShowWelcome(true)} style={{padding:"4px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,.2)",background:"rgba(255,255,255,.08)",color:"rgba(255,255,255,.6)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:ff}}>⚽ Elegir equipo</button>}
+              {userName && <span style={{fontSize:13,fontWeight:600,color:"rgba(255,255,255,.85)"}}>Hola, {userName} 👋</span>}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:mobile?8:16}}>
               <Countdown/>
@@ -2395,7 +2309,7 @@ export default function App() {
               {ut && nextMatch && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <span style={{fontSize:32}}>{ut.flag}</span>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.nextMatch}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>PRÓXIMO PARTIDO</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{nextMatch.home} vs {nextMatch.away}</div>
                   <div style={{fontSize:12,color:"#6B7280"}}>{nextMatch.date} · {nextMatch.time}</div>
                 </div>
@@ -2403,9 +2317,9 @@ export default function App() {
               {pollaRank && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontFamily:fb,fontSize:36,color:"#D4A843"}}>{pollaRank.pos}°</div>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.yourPosition}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>TU POSICIÓN EN LA POLLA</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{pollaRank.total} puntos</div>
-                  <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} {t.posOf} {pollaRank.of} {t.posIn} {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
+                  <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </div>
               </div>}
             </div>
@@ -2423,7 +2337,7 @@ export default function App() {
       <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>
         Creado por JPTDesign
         <span style={{margin:"0 8px"}}>·</span>
-        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>{t.changeTeam}</button>
+        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>Cambiar equipo</button>
       </div>
     </div>
   );
