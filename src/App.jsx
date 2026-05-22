@@ -1746,16 +1746,16 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
   const fetchFromGoogleSheets = useCallback(async () => {
     setLoading(true);
-    setImportMsg({ok:true, msg:{t.connectingSheets}});
+    setImportMsg({ ok: true, msg: t.connectingSheets });
     try {
       const allPlayers = [];
 
       // Fetch each group's master sheet
       const sheets = [
-        {id:ENV_SHEET_USA, group:"friends_usa", label:"Amigos USA"},
-        {id:ENV_SHEET_FAM, group:"family", label:"Familia"},
-        {id:ENV_SHEET_CO, group:"friends_co", label:"Amigos Colombia"},
-      ];
+  {id:getSheetId(ENV_SHEET_USA), group:"friends_usa", label:"Amigos USA"},
+  {id:getSheetId(ENV_SHEET_FAM), group:"family", label:"Familia"},
+  {id:getSheetId(ENV_SHEET_CO), group:"friends_co", label:"Amigos Colombia"},
+];
 
       for(const sheet of sheets){
         if(!sheet.id) continue;
