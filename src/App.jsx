@@ -153,8 +153,8 @@ const LANG = {
     aiDraw: "Empate",
   },
   en: {
-    brandSub: "Zona Mundialista",
-    brandTitle: "Zona Mundialista 2026",
+    brandSub: "WorldCup Zone",
+    brandTitle: "WorldCup Zone 2026",
     brandDesc: "Four connected views: Today's Games, Fixture Map, Statistics Center and Prediction Game.",
     dataMode: "Data mode:",
     apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
