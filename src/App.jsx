@@ -10,13 +10,11 @@ const IS_DEV=typeof window!=="undefined"&&window.location.hostname==="localhost"
 const FOOTBALL_URL=(path)=>IS_DEV?`/api/football${path}`:`/api/football?path=${encodeURIComponent(path)}`;
 const BSD_URL=(path)=>IS_DEV?`/api/bsd${path}`:`/api/bsd?path=${encodeURIComponent(path)}`;
 
-let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_USA="",ENV_SHEET_FAM="",ENV_SHEET_CO="";
+let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_ID="",ENV_SHEET_URL="";
 try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
 try{ENV_BSD_KEY=WCENV_BSD}catch(e){}
-try{ENV_SHEET_USA=WCENV_SHEET_USA}catch(e){}
-try{ENV_SHEET_FAM=WCENV_SHEET_FAM}catch(e){}
-try{ENV_SHEET_CO=WCENV_SHEET_CO}catch(e){}
-const ENV_HAS_SHEETS = !!(ENV_SHEET_USA||ENV_SHEET_FAM||ENV_SHEET_CO);
+try{ENV_SHEET_ID=WCENV_SHEET}catch(e){}
+if(ENV_SHEET_ID)ENV_SHEET_URL=`https://docs.google.com/spreadsheets/d/${ENV_SHEET_ID}/edit`;
 
 const LANG = {
   es: {
@@ -120,37 +118,6 @@ const LANG = {
     evGoal: "Gol", evPenalty: "Penal", evOwnGoal: "Autogol",
     evFreeKick: "Tiro Libre", evHeader: "Cabezazo", evFoul: "Falta",
     evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
-
-    // Knockout
-    groupStage: "Fase de Grupos", knockoutStage: "Eliminatorias",
-    r32Label: "Octavos de Final (16 partidos)", bracketLabel: "Cuadro Final (R16 → Final)",
-    r32Short: "Octavos", bracketShort: "Cuadro Final",
-    roundR32: "Octavos", roundR16: "Cuartos", roundQF: "Semifinal", roundSF: "Semifinal",
-    roundFinal: "Final", roundThird: "3er Puesto",
-    // Welcome
-    welcomeTitle: "¿A QUIÉN LE VAS?",
-    welcomeQ1: "¿A QUIÉN LE VAS?", welcomeQ1Sub: "Escoge tu selección favorita",
-    welcomeQ2: "¿QUIÉN ERES?", welcomeQ2Sub: "Escoge tu nombre para ver tu posición en la Polla",
-    welcomeSearch: "Buscar equipo...", welcomeNext: "Siguiente →", welcomeSkip: "Saltar →",
-    welcomeBack: "← Atrás", welcomeEnterAs: "Entrar como", welcomeEnterNoName: "Entrar sin nombre",
-    // Status
-    apiConnectedLabel: "API Conectada", apiWaiting: "Esperando datos", apiNoKey: "Sin API key",
-    apiLoading: "Conectando...", apiRefresh: "↻ Actualizar", apiAuto: "Auto 60s",
-    // Home personal
-    nextMatch: "{t.nextMatch}", yourPosition: "{t.yourPosition}",
-    posOf: "de", posIn: "en",
-    // Polla filters
-    pollaAll: "Todos", pollaUSA: "Amigos USA", pollaCO: "Amigos Colombia", pollaFam: "Familia",
-    connectingSheets: "Conectando con Google Sheets...",
-    noPredictions: "Sin predicciones disponibles.",
-    loadingPreds: "Cargando predicciones...",
-    // Countdown
-    daysToWC: "días para\nel Mundial", wcLive: "⚽ EN VIVO",
-    // Footer
-    changeTeam: "Cambiar equipo", pickTeam: "⚽ Elegir equipo",
-    // AI page
-    aiDesc: "Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data.",
-    aiDraw: "Empate",
   },
   en: {
     brandSub: "WorldCup Zone",
@@ -217,7 +184,7 @@ const LANG = {
     opponent: "Opponent", result: "Result",
     pj: "MP", g: "W", e: "D", p: "L", gf: "GF", gc: "GA", dg: "GD",
     pts: "Pts", avgPoss: "Avg Poss.", cleanSheet: "Clean Sh.",
-    pollaTitle: "POLLA MUNDIALISTA",
+    pollaTitle: "WorldCup Bracket",
     pollaDesc: "Correct result (W/D/L) = 3 pts · Exact score = +5 pts · Group winner = 5 pts · Champion = 15 pts · Golden Boot = 10 pts",
     importPlayers: "Import players",
     importDesc: "Paste JSON data from participants. Use the Excel converter to generate JSON from .xlsx files",
@@ -235,36 +202,6 @@ const LANG = {
     evGoal: "Goal", evPenalty: "Penalty", evOwnGoal: "Own Goal",
     evFreeKick: "Free Kick", evHeader: "Header", evFoul: "Foul",
     evYellow: "Yellow Card", evRed: "Red Card",
-    // Knockout
-    groupStage: "Group Stage", knockoutStage: "Knockout Stage",
-    r32Label: "Round of 32 (16 matches)", bracketLabel: "Final Bracket (R16 → Final)",
-    r32Short: "Round of 32", bracketShort: "Final Bracket",
-    roundR32: "R32", roundR16: "R16", roundQF: "Quarterfinal", roundSF: "Semifinal",
-    roundFinal: "Final", roundThird: "3rd Place",
-    // Welcome
-    welcomeTitle: "WHO ARE YOU ROOTING FOR?",
-    welcomeQ1: "WHO ARE YOU ROOTING FOR?", welcomeQ1Sub: "Pick your favorite team",
-    welcomeQ2: "WHO ARE YOU?", welcomeQ2Sub: "Pick your name to see your Polla ranking",
-    welcomeSearch: "Search team...", welcomeNext: "Next →", welcomeSkip: "Skip →",
-    welcomeBack: "← Back", welcomeEnterAs: "Enter as", welcomeEnterNoName: "Enter without name",
-    // Status
-    apiConnectedLabel: "API Connected", apiWaiting: "Waiting for data", apiNoKey: "No API key",
-    apiLoading: "Connecting...", apiRefresh: "↻ Refresh", apiAuto: "Auto 60s",
-    // Home personal
-    nextMatch: "NEXT MATCH", yourPosition: "YOUR POLLA POSITION",
-    posOf: "of", posIn: "in",
-    // Polla filters
-    pollaAll: "All", pollaUSA: "Friends USA", pollaCO: "Friends Colombia", pollaFam: "Family",
-    connectingSheets: "Connecting to Google Sheets...",
-    noPredictions: "No predictions available.",
-    loadingPreds: "Loading predictions...",
-    // Countdown
-    daysToWC: "days to\nWorld Cup", wcLive: "⚽ LIVE",
-    // Footer
-    changeTeam: "Change team", pickTeam: "⚽ Pick team",
-    // AI page
-    aiDesc: "AI-generated predictions (CatBoost ML) powered by Bzzoiro Sports Data.",
-    aiDraw: "Draw",
   }
 };
 
@@ -538,7 +475,7 @@ function Countdown() {
   return (
     <div style={{display:"flex",alignItems:"center",gap:8}}>
       <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days}</span>
-      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}} dangerouslySetInnerHTML={{__html:_t.daysToWC.replace("\\n","<br/>")}}/>
+      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>días para<br/>el Mundial</span>
     </div>
   );
 }
@@ -926,7 +863,7 @@ function KnockoutBracket({mobile}) {
   const [koView, setKoView] = useState("bracket");
 
   const roundColors = {r32:"#1B2A6B",r16:"#C8102E",qf:"#009B3A",sf:"#D4A843",final:"#1B2A6B",third:"#6B7280"};
-  const roundLabels = {r32:t.roundR32,r16:t.roundR16,qf:t.roundQF,sf:t.roundSF,final:t.roundFinal,third:t.roundThird};
+  const roundLabels = {r32:"Octavos",r16:"Cuartos",qf:"Semifinal",sf:"Semifinal",final:"Final",third:"3er Puesto"};
 
   const MatchCard = ({match, round, compact}) => {
     const ht=team(match.home), at=team(match.away);
@@ -967,7 +904,7 @@ function KnockoutBracket({mobile}) {
   if(mobile) {
     return (<div>
       <div style={{display:"flex",gap:6,marginBottom:16}}>
-        {[{id:"r32",l:t.r32Short},{id:"bracket",l:t.bracketShort}].map(v=>(
+        {[{id:"r32",l:"Octavos"},{id:"bracket",l:"Cuadro Final"}].map(v=>(
           <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:700,
             background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
         ))}
@@ -994,7 +931,7 @@ function KnockoutBracket({mobile}) {
   // Desktop: R32 as grid, R16+ as bracket
   return (<div>
     <div style={{display:"flex",gap:6,marginBottom:16}}>
-      {[{id:"r32",l:t.r32Label},{id:"bracket",l:t.bracketLabel}].map(v=>(
+      {[{id:"r32",l:"Octavos de Final (16 partidos)"},{id:"bracket",l:"Cuadro Final (R16 → Final)"}].map(v=>(
         <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
       ))}
@@ -1041,7 +978,7 @@ function FixturesPage({fixtures, onSelect}) {
   return (<div style={{padding:"20px 0"}}>
     {/* Phase toggle */}
     <div style={{display:"flex",gap:8,marginBottom:16}}>
-      {[{id:"groups",label:t.groupStage},{id:"knockout",label:t.knockoutStage}].map(p=>(
+      {[{id:"groups",label:"Fase de Grupos"},{id:"knockout",label:"Eliminatorias"}].map(p=>(
         <button key={p.id} onClick={()=>setPhase(p.id)} style={{
           padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:phase===p.id?"#1B2A6B":"#FFFFFF",color:phase===p.id?"#FFFFFF":"#4B5563",
@@ -1557,7 +1494,7 @@ function AIPredsPage() {
         {t.navAI || "PREDICCIONES AI"}
       </div>
       <div style={{fontSize:13,color:"#6B7280",marginBottom:12}}>
-        {t.aiDesc}
+        Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data. Probabilidades de victoria, empate, goles y cuotas de múltiples casas de apuestas.
       </div>
       {bsdMsg && <div style={{marginBottom:16,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
         background:bsdMsg.ok?"#10b98110":"#ef444410",color:bsdMsg.ok?"#10b981":"#ef4444"}}>
@@ -1600,7 +1537,7 @@ function AIPredsPage() {
                 {/* Probability bars */}
                 <div style={{padding:"0 16px 12px",display:"flex",gap:12}}>
                   <ProbBar label={p.home} pct={p.homeWin} color={p.homeWin===maxProb?"#1B2A6B":"#9CA3AF"}/>
-                  <ProbBar label={t.aiDraw} pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
+                  <ProbBar label="Empate" pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
                   <ProbBar label={p.away} pct={p.awayWin} color={p.awayWin===maxProb?"#C8102E":"#9CA3AF"}/>
                 </div>
                 {/* Odds + markets */}
@@ -1652,29 +1589,26 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
   const [filter,setFilter]=useState("all");
   const [showDemo,setShowDemo]=useState(true);
   const [importMsg,setImportMsg]=useState(null);
+  const [sheetUrl,setSheetUrl]=useState(ENV_SHEET_URL);
   const [sheetConnected,setSheetConnected]=useState(false);
   const [loading,setLoading]=useState(false);
 
-  // Auto-connect if any Sheet ID is configured
+  // Auto-connect if Sheet URL comes from env vars
   const [autoLoaded, setAutoLoaded] = useState(false);
   useEffect(() => {
-    if(ENV_HAS_SHEETS && !autoLoaded && !sheetConnected && uploaded.length === 0) {
+    if(ENV_SHEET_URL && !autoLoaded && !sheetConnected && uploaded.length === 0) {
       setAutoLoaded(true);
       fetchFromGoogleSheets();
     }
   }, [autoLoaded, sheetConnected, uploaded.length]);
 
-  // Merge: use sheet data where available, demo data for groups without sheets
-  const uploadedGroups = new Set(uploaded.map(p=>p.group));
-  const demoFiltered = showDemo ? DEMO_PLAYERS.filter(p=>!uploadedGroups.has(p.group)) : [];
-  const all=[...demoFiltered,...uploaded];
+  const all=[...(showDemo?DEMO_PLAYERS:[]),...uploaded];
   const fri=all.filter(p=>p.group==="friends_usa");
   const co=all.filter(p=>p.group==="friends_co");
   const fam=all.filter(p=>p.group==="family");
 
   // Parse Google Sheet ID from URL or raw ID
   const getSheetId = (input) => {
-    if(!input) return null;
     const match = input.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if(match) return match[1];
     if(/^[a-zA-Z0-9_-]{20,}$/.test(input.trim())) return input.trim();
@@ -1687,6 +1621,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     const res = await fetch(url);
     if(!res.ok) throw new Error(`No se pudo acceder a la hoja "${tabName}" (HTTP ${res.status})`);
     const text = await res.text();
+    // Parse CSV manually (simple parser for Google Sheets output)
     const rows = [];
     let current = [];
     let inQuote = false;
@@ -1707,79 +1642,109 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     return rows;
   };
 
-  // Parse a master sheet's "Imported Picks" tab
-  // Format: Friend(0), Section(1), MatchNum(2), Date(3), Group(4), TeamA(5), TeamB(6), ScoreA(7), ScoreB(8), ...
-  const parseMasterSheet = async (sheetId, groupTag) => {
-    const players = {};
-
-    // Read "Imported Picks" tab
-    const rows = await fetchCsv(sheetId, "Imported Picks");
-    if(rows.length < 2) return [];
-
-    // Skip header row
-    for(let r=1; r<rows.length; r++){
-      const row = rows[r];
-      const name = (row[0]||"").trim();
-      if(!name) continue;
-
-      const matchNum = parseInt(row[2]);
-      if(isNaN(matchNum) || matchNum<1 || matchNum>104) continue;
-
-      // Create player if new
-      if(!players[name]){
-        players[name] = {name, group:groupTag, champion:"", goldenBoot:"", groupWinners:{}, matches:{}, uploaded:true};
-      }
-
-      // Parse predicted scores (columns 7 and 8)
-      const hVal = parseInt(row[7]);
-      const aVal = parseInt(row[8]);
-      if(isNaN(hVal) && isNaN(aVal)) continue; // no prediction yet
-
-      const h = isNaN(hVal) ? 0 : hVal;
-      const a = isNaN(aVal) ? 0 : aVal;
-      const result = h > a ? "W" : h < a ? "L" : "D";
-      players[name].matches[matchNum-1] = {r:result, h, a};
-    }
-
-    return Object.values(players);
-  };
-
   const fetchFromGoogleSheets = useCallback(async () => {
+    const sheetId = getSheetId(sheetUrl);
+    if(!sheetId){setImportMsg({ok:false,msg:"Pega la URL completa de tu Google Sheet o el ID del documento"});return}
     setLoading(true);
-    setImportMsg({ok:true, msg:{t.connectingSheets}});
+    setImportMsg({ok:true,msg:"Conectando con Google Sheets..."});
     try {
-      const allPlayers = [];
-
-      // Fetch each group's master sheet
-      const sheets = [
-        {id:ENV_SHEET_USA, group:"friends_usa", label:"Amigos USA"},
-        {id:ENV_SHEET_FAM, group:"family", label:"Familia"},
-        {id:ENV_SHEET_CO, group:"friends_co", label:"Amigos Colombia"},
-      ];
-
-      for(const sheet of sheets){
-        if(!sheet.id) continue;
-        try {
-          const players = await parseMasterSheet(sheet.id, sheet.group);
-          allPlayers.push(...players);
-        } catch(e) {
-          console.warn(`Error al leer ${sheet.label}: ${e.message}`);
-        }
+      // Fetch "Picks" tab
+      const picksRows = await fetchCsv(sheetId, "Picks");
+      if(picksRows.length < 2) throw new Error("La hoja 'Picks' está vacía o no existe");
+      
+      // Parse header row to find column indices
+      const picksHeader = picksRows[0].map(h=>h.toLowerCase().replace(/\s+/g,"_"));
+      const pi = (name) => picksHeader.findIndex(h=>h.includes(name));
+      const iName=pi("nombre"), iGroup=pi("grupo"), iChamp=pi("campe")||pi("champion"),
+            iGolden=pi("bota")||pi("golden");
+      
+      // Group winner columns: Gr_A through Gr_L
+      const gLetters=["A","B","C","D","E","F","G","H","I","J","K","L"];
+      const gCols={};
+      gLetters.forEach(g=>{
+        const idx=picksHeader.findIndex(h=>h.includes(`gr_${g.toLowerCase()}`)||h===`gr${g.toLowerCase()}`);
+        if(idx>=0) gCols[g]=idx;
+      });
+      
+      const players = {};
+      for(let r=1; r<picksRows.length; r++){
+        const row=picksRows[r];
+        const name=row[iName>=0?iName:0]||"";
+        if(!name||name==="EJEMPLO"||name.startsWith("REFERENCIA")||name.startsWith("↑")||name.startsWith("▼")) continue;
+        const rawGroup=(row[iGroup>=0?iGroup:1]||"").toLowerCase();
+        const group=rawGroup.includes("amigo")||rawGroup.includes("friend")?"friends":"family";
+        const champion=row[iChamp>=0?iChamp:2]||"";
+        const goldenBoot=row[iGolden>=0?iGolden:3]||"";
+        const groupWinners={};
+        gLetters.forEach(g=>{if(gCols[g]!=null&&row[gCols[g]]) groupWinners[g]=row[gCols[g]]});
+        players[name]={name,group,champion,goldenBoot,groupWinners,matches:{},uploaded:true};
       }
-
-      if(allPlayers.length === 0) throw new Error("No se encontraron jugadores con predicciones. Verifica que las hojas estén publicadas.");
-
-      setUploaded(allPlayers);
+      
+      // Fetch "Predicciones" tab (flat format: Nombre, Partido, ..., Goles_L, Goles_V)
+      try {
+        const predRows = await fetchCsv(sheetId, "Predicciones");
+        if(predRows.length>1){
+          const predHeader=predRows[0].map(h=>h.toLowerCase().replace(/[^a-z0-9_]/g,""));
+          const pName=predHeader.findIndex(h=>h.includes("nombre"));
+          const pMatch=predHeader.findIndex(h=>h.includes("partido")||h==="match"||h==="#");
+          const pGL=predHeader.findIndex(h=>h.includes("golesl")||h.includes("gol_l")||h.includes("goles"));
+          const pGV=predHeader.findIndex(h=>h.includes("golesv")||h.includes("gol_v"));
+          // If no separate goles_v column, try columns D and E (indices 3,4) for the simple format
+          const glIdx = pGL>=0 ? pGL : 3;
+          const gvIdx = pGV>=0 ? pGV : (pGL>=0 ? pGL+1 : 4);
+          
+          for(let r=1; r<predRows.length; r++){
+            const row=predRows[r];
+            const name=row[pName>=0?pName:0]||"";
+            if(!name||name.startsWith("EJEMPLO")||name.startsWith("↑")||name.startsWith("▼")||name.startsWith("📅")||name.startsWith("#")) continue;
+            const matchNum=parseInt(row[pMatch>=0?pMatch:1]);
+            if(isNaN(matchNum)||matchNum<1||matchNum>72) continue;
+            const hVal=parseInt(row[glIdx]);
+            const aVal=parseInt(row[gvIdx]);
+            if(isNaN(hVal)&&isNaN(aVal)) continue;
+            const result=!isNaN(hVal)&&!isNaN(aVal)?(hVal>aVal?"W":hVal<aVal?"L":"D"):"D";
+            if(!players[name]) players[name]={name,group:"friends_usa",champion:"",goldenBoot:"",groupWinners:{},matches:{},uploaded:true};
+            players[name].matches[matchNum-1]={r:result,h:isNaN(hVal)?0:hVal,a:isNaN(aVal)?0:aVal};
+          }
+        }
+      } catch(e) { /* Predicciones tab may not exist yet */ }
+      
+      // Also check for per-person tabs (pretty format: name in row 3, scores in columns D+E)
+      const knownTabs = ["picks","predicciones"];
+      const picksNames = Object.keys(players).map(n=>n.toLowerCase());
+      try {
+        // Try fetching tabs named after players
+        for(const pName of Object.keys(players)) {
+          try {
+            const tabRows = await fetchCsv(sheetId, pName);
+            if(tabRows.length < 6) continue;
+            // Look for match rows: column A or B has a number 1-72
+            for(const row of tabRows) {
+              const numA=parseInt(row[0]), numB=parseInt(row[1]);
+              const matchNum = (numA>=1&&numA<=72)?numA:(numB>=1&&numB<=72)?numB:NaN;
+              if(isNaN(matchNum)) continue;
+              const hVal=parseInt(row[3]); // column D = Goles Local
+              const aVal=parseInt(row[4]); // column E = Goles Visitante
+              if(isNaN(hVal)&&isNaN(aVal)) continue;
+              const result=!isNaN(hVal)&&!isNaN(aVal)?(hVal>aVal?"W":hVal<aVal?"L":"D"):"D";
+              players[pName].matches[matchNum-1]={r:result,h:isNaN(hVal)?0:hVal,a:isNaN(aVal)?0:aVal};
+            }
+          } catch(e2) { /* tab doesn't exist for this player */ }
+        }
+      } catch(e) { /* individual tabs not required */ }
+      
+      const playerList=Object.values(players);
+      if(playerList.length===0) throw new Error("No se encontraron jugadores en la hoja");
+      
+      setUploaded(playerList);
       setSheetConnected(true);
-      setShowDemo(false);
-      const matchCount = allPlayers.reduce((s,p)=>s+Object.keys(p.matches).length, 0);
-      const groups = [...new Set(allPlayers.map(p=>p.group))];
-      setImportMsg({ok:true, msg:`✓ ${allPlayers.length} jugadores · ${matchCount} predicciones · ${groups.length} grupo(s)`});
-    } catch(err) {
+      const matchCount = playerList.reduce((s,p)=>s+Object.keys(p.matches).length,0);
+      setImportMsg({ok:true,msg:`✓ ${playerList.length} jugadores cargados · ${matchCount} predicciones · Conectado a Google Sheets`});
+    } catch(err){
       setImportMsg({ok:false, msg:err.message});
     }
     setLoading(false);
-  },[setUploaded]);
+  },[sheetUrl, setUploaded]);
 
   const remove=(name)=>{setUploaded(prev=>prev.filter(p=>p.name!==name));if(sel?.name===name)setSel(null)};
 
@@ -1884,7 +1849,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     </div>}
     {/* Filters */}
     <div style={{display:"flex",gap:6,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
-      {[{id:"all",l:t.pollaAll},{id:"friends_usa",l:t.pollaUSA},{id:"friends_co",l:t.pollaCO},{id:"family",l:t.pollaFam}].map(f=>(
+      {[{id:"all",l:"Todos"},{id:"friends_usa",l:"Amigos USA"},{id:"friends_co",l:"Amigos Colombia"},{id:"family",l:"Familia"}].map(f=>(
         <button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:8,border:"1px solid rgba(0,0,0,.08)",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:ff,background:filter===f.id?"#1B2A6B":"#FFFFFF",color:filter===f.id?"#FFFFFF":"#4B5563"}}>{f.l}</button>))}
       <label style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:12,color:"#4B5563"}}>
         <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> {t.showDemo}</label>
@@ -2075,7 +2040,7 @@ function FetchPanel({fixtures, onUpdate}) {
     <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 16px",background:"rgba(255,255,255,.06)",borderRadius:10,marginBottom:12}}>
       <div style={{width:8,height:8,borderRadius:4,background:isConnected?"#10b981":hasKey?"#D4A843":"#6B7280"}}/>
       <span style={{fontSize:12,fontWeight:600,color:isConnected?"#10b981":hasKey?"#D4A843":"rgba(255,255,255,.5)"}}>
-        {isConnected?t.apiConnectedLabel:loading?"Conectando...":hasKey?t.apiWaiting:t.apiNoKey}
+        {isConnected?"API Conectada":loading?"Conectando...":hasKey?"Esperando datos":"Sin API key"}
       </span>
       {status?.msg && <span style={{fontSize:12,color:"rgba(255,255,255,.5)"}}>{status.msg}</span>}
       <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
@@ -2134,13 +2099,13 @@ function WelcomeScreen({onComplete, players}) {
 
         {step === 1 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ1}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>{t.welcomeQ1Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿A QUIÉN LE VAS?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>Escoge tu selección favorita</div>
 
             {/* Search */}
             <input
               type="text" value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder={t.welcomeSearch}
+              placeholder="Buscar equipo..."
               style={{width:"100%",padding:"10px 16px",borderRadius:12,border:"2px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:14,fontFamily:ff,outline:"none",boxSizing:"border-box",marginBottom:16,textAlign:"center"}}
             />
 
@@ -2161,14 +2126,14 @@ function WelcomeScreen({onComplete, players}) {
             <button onClick={()=>setStep(2)} style={{
               marginTop:20,padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
               background:selTeam?"#D4A843":"rgba(255,255,255,.15)",color:selTeam?"#1B2A6B":"rgba(255,255,255,.4)",
-            }}>{selTeam ? t.welcomeNext : t.welcomeSkip}</button>
+            }}>{selTeam ? "Siguiente →" : "Saltar →"}</button>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ2}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>{t.welcomeQ2Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿QUIÉN ERES?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>Escoge tu nombre para ver tu posición en la Polla</div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
               {players.map(p => (
@@ -2188,7 +2153,7 @@ function WelcomeScreen({onComplete, players}) {
               <button onClick={finish} style={{
                 padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
                 background:"#D4A843",color:"#1B2A6B",
-              }}>{selName ? `${t.welcomeEnterAs} ${selName}` : t.welcomeEnterNoName}</button>
+              }}>{selName ? `Entrar como ${selName}` : "Entrar sin nombre"}</button>
             </div>
           </div>
         )}
@@ -2339,7 +2304,7 @@ export default function App() {
         {[
           {label:"Marcadores",key:ENV_FOOTBALL_KEY,icon:"⚽"},
           {label:"Predicciones AI",key:ENV_BSD_KEY,icon:"🤖"},
-          {label:"Google Sheets",key:ENV_HAS_SHEETS?"1":"",icon:"📊"},
+          {label:"Google Sheets",key:ENV_SHEET_ID,icon:"📊"},
         ].map(s=>{
           const configured = !!s.key;
           return (
@@ -2370,7 +2335,7 @@ export default function App() {
               {ut && nextMatch && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <span style={{fontSize:32}}>{ut.flag}</span>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.nextMatch}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>PRÓXIMO PARTIDO</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{nextMatch.home} vs {nextMatch.away}</div>
                   <div style={{fontSize:12,color:"#6B7280"}}>{nextMatch.date} · {nextMatch.time}</div>
                 </div>
@@ -2378,7 +2343,7 @@ export default function App() {
               {pollaRank && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontFamily:fb,fontSize:36,color:"#D4A843"}}>{pollaRank.pos}°</div>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.yourPosition}</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>TU POSICIÓN EN LA POLLA</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{pollaRank.total} puntos</div>
                   <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </div>
@@ -2398,7 +2363,7 @@ export default function App() {
       <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>
         Creado por JPTDesign
         <span style={{margin:"0 8px"}}>·</span>
-        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>{t.changeTeam}</button>
+        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>Cambiar equipo</button>
       </div>
     </div>
   );
