@@ -120,6 +120,37 @@ const LANG = {
     evGoal: "Gol", evPenalty: "Penal", evOwnGoal: "Autogol",
     evFreeKick: "Tiro Libre", evHeader: "Cabezazo", evFoul: "Falta",
     evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
+
+    // Knockout
+    groupStage: "Fase de Grupos", knockoutStage: "Eliminatorias",
+    r32Label: "Octavos de Final (16 partidos)", bracketLabel: "Cuadro Final (R16 → Final)",
+    r32Short: "Octavos", bracketShort: "Cuadro Final",
+    roundR32: "Octavos", roundR16: "Cuartos", roundQF: "Semifinal", roundSF: "Semifinal",
+    roundFinal: "Final", roundThird: "3er Puesto",
+    // Welcome
+    welcomeTitle: "¿A QUIÉN LE VAS?",
+    welcomeQ1: "¿A QUIÉN LE VAS?", welcomeQ1Sub: "Escoge tu selección favorita",
+    welcomeQ2: "¿QUIÉN ERES?", welcomeQ2Sub: "Escoge tu nombre para ver tu posición en la Polla",
+    welcomeSearch: "Buscar equipo...", welcomeNext: "Siguiente →", welcomeSkip: "Saltar →",
+    welcomeBack: "← Atrás", welcomeEnterAs: "Entrar como", welcomeEnterNoName: "Entrar sin nombre",
+    // Status
+    apiConnectedLabel: "API Conectada", apiWaiting: "Esperando datos", apiNoKey: "Sin API key",
+    apiLoading: "Conectando...", apiRefresh: "↻ Actualizar", apiAuto: "Auto 60s",
+    // Home personal
+    nextMatch: "{t.nextMatch}", yourPosition: "{t.yourPosition}",
+    posOf: "de", posIn: "en",
+    // Polla filters
+    pollaAll: "Todos", pollaUSA: "Amigos USA", pollaCO: "Amigos Colombia", pollaFam: "Familia",
+    connectingSheets: "Conectando con Google Sheets...",
+    noPredictions: "Sin predicciones disponibles.",
+    loadingPreds: "Cargando predicciones...",
+    // Countdown
+    daysToWC: "días para\nel Mundial", wcLive: "⚽ EN VIVO",
+    // Footer
+    changeTeam: "Cambiar equipo", pickTeam: "⚽ Elegir equipo",
+    // AI page
+    aiDesc: "Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data.",
+    aiDraw: "Empate",
   },
   en: {
     brandSub: "Zona Mundialista",
@@ -204,6 +235,36 @@ const LANG = {
     evGoal: "Goal", evPenalty: "Penalty", evOwnGoal: "Own Goal",
     evFreeKick: "Free Kick", evHeader: "Header", evFoul: "Foul",
     evYellow: "Yellow Card", evRed: "Red Card",
+    // Knockout
+    groupStage: "Group Stage", knockoutStage: "Knockout Stage",
+    r32Label: "Round of 32 (16 matches)", bracketLabel: "Final Bracket (R16 → Final)",
+    r32Short: "Round of 32", bracketShort: "Final Bracket",
+    roundR32: "R32", roundR16: "R16", roundQF: "Quarterfinal", roundSF: "Semifinal",
+    roundFinal: "Final", roundThird: "3rd Place",
+    // Welcome
+    welcomeTitle: "WHO ARE YOU ROOTING FOR?",
+    welcomeQ1: "WHO ARE YOU ROOTING FOR?", welcomeQ1Sub: "Pick your favorite team",
+    welcomeQ2: "WHO ARE YOU?", welcomeQ2Sub: "Pick your name to see your Polla ranking",
+    welcomeSearch: "Search team...", welcomeNext: "Next →", welcomeSkip: "Skip →",
+    welcomeBack: "← Back", welcomeEnterAs: "Enter as", welcomeEnterNoName: "Enter without name",
+    // Status
+    apiConnectedLabel: "API Connected", apiWaiting: "Waiting for data", apiNoKey: "No API key",
+    apiLoading: "Connecting...", apiRefresh: "↻ Refresh", apiAuto: "Auto 60s",
+    // Home personal
+    nextMatch: "NEXT MATCH", yourPosition: "YOUR POLLA POSITION",
+    posOf: "of", posIn: "in",
+    // Polla filters
+    pollaAll: "All", pollaUSA: "Friends USA", pollaCO: "Friends Colombia", pollaFam: "Family",
+    connectingSheets: "Connecting to Google Sheets...",
+    noPredictions: "No predictions available.",
+    loadingPreds: "Loading predictions...",
+    // Countdown
+    daysToWC: "days to\nWorld Cup", wcLive: "⚽ LIVE",
+    // Footer
+    changeTeam: "Change team", pickTeam: "⚽ Pick team",
+    // AI page
+    aiDesc: "AI-generated predictions (CatBoost ML) powered by Bzzoiro Sports Data.",
+    aiDraw: "Draw",
   }
 };
 
@@ -477,7 +538,7 @@ function Countdown() {
   return (
     <div style={{display:"flex",alignItems:"center",gap:8}}>
       <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days}</span>
-      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>días para<br/>el Mundial</span>
+      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}} dangerouslySetInnerHTML={{__html:_t.daysToWC.replace("\\n","<br/>")}}/>
     </div>
   );
 }
@@ -865,7 +926,7 @@ function KnockoutBracket({mobile}) {
   const [koView, setKoView] = useState("bracket");
 
   const roundColors = {r32:"#1B2A6B",r16:"#C8102E",qf:"#009B3A",sf:"#D4A843",final:"#1B2A6B",third:"#6B7280"};
-  const roundLabels = {r32:"Octavos",r16:"Cuartos",qf:"Semifinal",sf:"Semifinal",final:"Final",third:"3er Puesto"};
+  const roundLabels = {r32:t.roundR32,r16:t.roundR16,qf:t.roundQF,sf:t.roundSF,final:t.roundFinal,third:t.roundThird};
 
   const MatchCard = ({match, round, compact}) => {
     const ht=team(match.home), at=team(match.away);
@@ -906,7 +967,7 @@ function KnockoutBracket({mobile}) {
   if(mobile) {
     return (<div>
       <div style={{display:"flex",gap:6,marginBottom:16}}>
-        {[{id:"r32",l:"Octavos"},{id:"bracket",l:"Cuadro Final"}].map(v=>(
+        {[{id:"r32",l:t.r32Short},{id:"bracket",l:t.bracketShort}].map(v=>(
           <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:13,fontWeight:700,
             background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
         ))}
@@ -933,7 +994,7 @@ function KnockoutBracket({mobile}) {
   // Desktop: R32 as grid, R16+ as bracket
   return (<div>
     <div style={{display:"flex",gap:6,marginBottom:16}}>
-      {[{id:"r32",l:"Octavos de Final (16 partidos)"},{id:"bracket",l:"Cuadro Final (R16 → Final)"}].map(v=>(
+      {[{id:"r32",l:t.r32Label},{id:"bracket",l:t.bracketLabel}].map(v=>(
         <button key={v.id} onClick={()=>setKoView(v.id)} style={{padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:koView===v.id?"#1B2A6B":"#FFFFFF",color:koView===v.id?"#FFFFFF":"#4B5563",boxShadow:koView===v.id?"none":"0 1px 3px rgba(0,0,0,.08)"}}>{v.l}</button>
       ))}
@@ -980,7 +1041,7 @@ function FixturesPage({fixtures, onSelect}) {
   return (<div style={{padding:"20px 0"}}>
     {/* Phase toggle */}
     <div style={{display:"flex",gap:8,marginBottom:16}}>
-      {[{id:"groups",label:"Fase de Grupos"},{id:"knockout",label:"Eliminatorias"}].map(p=>(
+      {[{id:"groups",label:t.groupStage},{id:"knockout",label:t.knockoutStage}].map(p=>(
         <button key={p.id} onClick={()=>setPhase(p.id)} style={{
           padding:"8px 20px",borderRadius:10,border:"none",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:700,
           background:phase===p.id?"#1B2A6B":"#FFFFFF",color:phase===p.id?"#FFFFFF":"#4B5563",
@@ -1496,7 +1557,7 @@ function AIPredsPage() {
         {t.navAI || "PREDICCIONES AI"}
       </div>
       <div style={{fontSize:13,color:"#6B7280",marginBottom:12}}>
-        Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data. Probabilidades de victoria, empate, goles y cuotas de múltiples casas de apuestas.
+        {t.aiDesc}
       </div>
       {bsdMsg && <div style={{marginBottom:16,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
         background:bsdMsg.ok?"#10b98110":"#ef444410",color:bsdMsg.ok?"#10b981":"#ef4444"}}>
@@ -1539,7 +1600,7 @@ function AIPredsPage() {
                 {/* Probability bars */}
                 <div style={{padding:"0 16px 12px",display:"flex",gap:12}}>
                   <ProbBar label={p.home} pct={p.homeWin} color={p.homeWin===maxProb?"#1B2A6B":"#9CA3AF"}/>
-                  <ProbBar label="Empate" pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
+                  <ProbBar label={t.aiDraw} pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
                   <ProbBar label={p.away} pct={p.awayWin} color={p.awayWin===maxProb?"#C8102E":"#9CA3AF"}/>
                 </div>
                 {/* Odds + markets */}
@@ -1685,7 +1746,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
 
   const fetchFromGoogleSheets = useCallback(async () => {
     setLoading(true);
-    setImportMsg({ok:true, msg:"Conectando con Google Sheets..."});
+    setImportMsg({ok:true, msg:{t.connectingSheets}});
     try {
       const allPlayers = [];
 
@@ -1823,7 +1884,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     </div>}
     {/* Filters */}
     <div style={{display:"flex",gap:6,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
-      {[{id:"all",l:"Todos"},{id:"friends_usa",l:"Amigos USA"},{id:"friends_co",l:"Amigos Colombia"},{id:"family",l:"Familia"}].map(f=>(
+      {[{id:"all",l:t.pollaAll},{id:"friends_usa",l:t.pollaUSA},{id:"friends_co",l:t.pollaCO},{id:"family",l:t.pollaFam}].map(f=>(
         <button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:8,border:"1px solid rgba(0,0,0,.08)",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:ff,background:filter===f.id?"#1B2A6B":"#FFFFFF",color:filter===f.id?"#FFFFFF":"#4B5563"}}>{f.l}</button>))}
       <label style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:12,color:"#4B5563"}}>
         <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> {t.showDemo}</label>
@@ -2014,7 +2075,7 @@ function FetchPanel({fixtures, onUpdate}) {
     <div style={{display:"flex",alignItems:"center",gap:12,padding:"8px 16px",background:"rgba(255,255,255,.06)",borderRadius:10,marginBottom:12}}>
       <div style={{width:8,height:8,borderRadius:4,background:isConnected?"#10b981":hasKey?"#D4A843":"#6B7280"}}/>
       <span style={{fontSize:12,fontWeight:600,color:isConnected?"#10b981":hasKey?"#D4A843":"rgba(255,255,255,.5)"}}>
-        {isConnected?"API Conectada":loading?"Conectando...":hasKey?"Esperando datos":"Sin API key"}
+        {isConnected?t.apiConnectedLabel:loading?"Conectando...":hasKey?t.apiWaiting:t.apiNoKey}
       </span>
       {status?.msg && <span style={{fontSize:12,color:"rgba(255,255,255,.5)"}}>{status.msg}</span>}
       <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:8}}>
@@ -2073,13 +2134,13 @@ function WelcomeScreen({onComplete, players}) {
 
         {step === 1 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿A QUIÉN LE VAS?</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>Escoge tu selección favorita</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ1}</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>{t.welcomeQ1Sub}</div>
 
             {/* Search */}
             <input
               type="text" value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder="Buscar equipo..."
+              placeholder={t.welcomeSearch}
               style={{width:"100%",padding:"10px 16px",borderRadius:12,border:"2px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:14,fontFamily:ff,outline:"none",boxSizing:"border-box",marginBottom:16,textAlign:"center"}}
             />
 
@@ -2100,14 +2161,14 @@ function WelcomeScreen({onComplete, players}) {
             <button onClick={()=>setStep(2)} style={{
               marginTop:20,padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
               background:selTeam?"#D4A843":"rgba(255,255,255,.15)",color:selTeam?"#1B2A6B":"rgba(255,255,255,.4)",
-            }}>{selTeam ? "Siguiente →" : "Saltar →"}</button>
+            }}>{selTeam ? t.welcomeNext : t.welcomeSkip}</button>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿QUIÉN ERES?</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>Escoge tu nombre para ver tu posición en la Polla</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ2}</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>{t.welcomeQ2Sub}</div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
               {players.map(p => (
@@ -2127,7 +2188,7 @@ function WelcomeScreen({onComplete, players}) {
               <button onClick={finish} style={{
                 padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
                 background:"#D4A843",color:"#1B2A6B",
-              }}>{selName ? `Entrar como ${selName}` : "Entrar sin nombre"}</button>
+              }}>{selName ? `${t.welcomeEnterAs} ${selName}` : t.welcomeEnterNoName}</button>
             </div>
           </div>
         )}
@@ -2309,7 +2370,7 @@ export default function App() {
               {ut && nextMatch && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <span style={{fontSize:32}}>{ut.flag}</span>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>PRÓXIMO PARTIDO</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.nextMatch}</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{nextMatch.home} vs {nextMatch.away}</div>
                   <div style={{fontSize:12,color:"#6B7280"}}>{nextMatch.date} · {nextMatch.time}</div>
                 </div>
@@ -2317,7 +2378,7 @@ export default function App() {
               {pollaRank && <div style={{flex:1,minWidth:220,background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.06)",display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontFamily:fb,fontSize:36,color:"#D4A843"}}>{pollaRank.pos}°</div>
                 <div>
-                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>TU POSICIÓN EN LA POLLA</div>
+                  <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>{t.yourPosition}</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{pollaRank.total} puntos</div>
                   <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </div>
@@ -2337,7 +2398,7 @@ export default function App() {
       <div style={{textAlign:"center",padding:"24px 16px",fontSize:12,color:"#9CA3AF",fontWeight:500}}>
         Creado por JPTDesign
         <span style={{margin:"0 8px"}}>·</span>
-        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>Cambiar equipo</button>
+        <button onClick={()=>{savePref("onboarded",false);savePref("team",null);savePref("name",null);setShowWelcome(true)}} style={{background:"none",border:"none",color:"#9CA3AF",cursor:"pointer",fontSize:12,fontFamily:ff,textDecoration:"underline"}}>{t.changeTeam}</button>
       </div>
     </div>
   );
