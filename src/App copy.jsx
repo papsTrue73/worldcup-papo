@@ -10,12 +10,13 @@ const IS_DEV=typeof window!=="undefined"&&window.location.hostname==="localhost"
 const FOOTBALL_URL=(path)=>IS_DEV?`/api/football${path}`:`/api/football?path=${encodeURIComponent(path)}`;
 const BSD_URL=(path)=>IS_DEV?`/api/bsd${path}`:`/api/bsd?path=${encodeURIComponent(path)}`;
 
-let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_USA="",ENV_SHEET_FAM="";
+let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_USA="",ENV_SHEET_FAM="",ENV_SHEET_CO="";
 try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
 try{ENV_BSD_KEY=WCENV_BSD}catch(e){}
 try{ENV_SHEET_USA=WCENV_SHEET_USA}catch(e){}
 try{ENV_SHEET_FAM=WCENV_SHEET_FAM}catch(e){}
-const ENV_HAS_SHEETS = !!(ENV_SHEET_USA||ENV_SHEET_FAM);
+try{ENV_SHEET_CO=WCENV_SHEET_CO}catch(e){}
+const ENV_HAS_SHEETS = !!(ENV_SHEET_USA||ENV_SHEET_FAM||ENV_SHEET_CO);
 
 const LANG = {
   es: {
@@ -106,7 +107,7 @@ const LANG = {
     importDesc: "Pega datos JSON de los participantes. Usa el convertidor de Excel para generar el JSON desde los archivos .xlsx",
     importBtn: "📋 Importar JSON", importClose: "Cerrar", importGo: "Importar",
     imported: "importado", importedPlural: "importados",
-    friends_usa: "AMIGOS USA", family: "FAMILIA", players: "jugadores",
+    friends_usa: "AMIGOS USA", friends_co: "AMIGOS COLOMBIA", family: "FAMILIA", players: "jugadores",
     showDemo: "Datos demo", noPlayers: "Sin jugadores. Importa datos o activa el demo.",
     pos: "Pos", name: "Nombre", resultsCol: "Resultado", exactCol: "Exacto",
     groupCol: "Grupo", bonusCol: "Bonos", totalCol: "Total",
@@ -191,7 +192,7 @@ const LANG = {
     importDesc: "Paste JSON data from participants. Use the Excel converter to generate JSON from .xlsx files",
     importBtn: "📋 Import JSON", importClose: "Close", importGo: "Import",
     imported: "imported", importedPlural: "imported",
-    friends_usa: "FRIENDS USA", family: "FAMILY", players: "players",
+    friends_usa: "FRIENDS USA", friends_co: "FRIENDS COLOMBIA", family: "FAMILY", players: "players",
     showDemo: "Demo data", noPlayers: "No players. Import data or enable demo.",
     pos: "Pos", name: "Name", resultsCol: "Results", exactCol: "Exact",
     groupCol: "Groups", bonusCol: "Bonus", totalCol: "Total",
@@ -410,6 +411,37 @@ const DEMO_PLAYERS = [
   {name:"Sebas",group:"family",champion:"Brazil",goldenBoot:"Vinícius Jr.",
     groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Japan",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
     matches:{0:{r:"W",h:2,a:0},1:{r:"D",h:1,a:1},2:{r:"W",h:1,a:0},3:{r:"D",h:0,a:0}}},
+  // Amigos Colombia
+  {name:"Chami",group:"friends_co",champion:"Colombia",goldenBoot:"Luis Díaz",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:2,a:1},1:{r:"D",h:0,a:0},2:{r:"W",h:2,a:0},3:{r:"D",h:1,a:1}}},
+  {name:"Charly",group:"friends_co",champion:"Argentina",goldenBoot:"Messi",
+    groupWinners:{A:"Mexico",B:"Switzerland",C:"Brazil",D:"USA",E:"Germany",F:"Japan",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
+    matches:{0:{r:"W",h:1,a:0},1:{r:"W",h:2,a:1},2:{r:"D",h:1,a:1},3:{r:"W",h:2,a:0}}},
+  {name:"Fan",group:"friends_co",champion:"Brazil",goldenBoot:"Vinícius Jr.",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Morocco",D:"Türkiye",E:"Ecuador",F:"Netherlands",G:"Egypt",H:"Uruguay",I:"France",J:"Argentina",K:"Colombia",L:"Croatia"},
+    matches:{0:{r:"D",h:1,a:1},1:{r:"D",h:1,a:1},2:{r:"W",h:3,a:0},3:{r:"L",h:0,a:2}}},
+  {name:"Fede",group:"friends_co",champion:"Colombia",goldenBoot:"Jhon Durán",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:3,a:0},1:{r:"D",h:1,a:1},2:{r:"W",h:2,a:1},3:{r:"W",h:1,a:0}}},
+  {name:"Flaco",group:"friends_co",champion:"Spain",goldenBoot:"Yamal",
+    groupWinners:{A:"South Korea",B:"Switzerland",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
+    matches:{0:{r:"W",h:2,a:1},1:{r:"L",h:0,a:1},2:{r:"D",h:0,a:0},3:{r:"D",h:2,a:2}}},
+  {name:"Jose",group:"friends_co",champion:"Argentina",goldenBoot:"Mbappé",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Portugal",L:"England"},
+    matches:{0:{r:"W",h:2,a:0},1:{r:"D",h:1,a:1},2:{r:"W",h:1,a:0},3:{r:"W",h:3,a:1}}},
+  {name:"Juan",group:"friends_co",champion:"France",goldenBoot:"Haaland",
+    groupWinners:{A:"Mexico",B:"Switzerland",C:"Brazil",D:"USA",E:"Germany",F:"Japan",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"Croatia"},
+    matches:{0:{r:"L",h:0,a:2},1:{r:"W",h:2,a:0},2:{r:"W",h:2,a:0},3:{r:"D",h:0,a:0}}},
+  {name:"Kiko",group:"friends_co",champion:"Colombia",goldenBoot:"Luis Díaz",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"Paraguay",E:"Ecuador",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:1,a:0},1:{r:"D",h:2,a:2},2:{r:"W",h:2,a:1},3:{r:"W",h:2,a:0}}},
+  {name:"Lucho",group:"friends_co",champion:"Germany",goldenBoot:"Musiala",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Uruguay",I:"Norway",J:"Argentina",K:"Portugal",L:"England"},
+    matches:{0:{r:"D",h:0,a:0},1:{r:"W",h:3,a:1},2:{r:"L",h:0,a:1},3:{r:"W",h:2,a:1}}},
+  {name:"Mario",group:"friends_co",champion:"Colombia",goldenBoot:"Jhon Durán",
+    groupWinners:{A:"Mexico",B:"Canada",C:"Brazil",D:"USA",E:"Germany",F:"Netherlands",G:"Belgium",H:"Spain",I:"France",J:"Argentina",K:"Colombia",L:"England"},
+    matches:{0:{r:"W",h:2,a:1},1:{r:"D",h:1,a:1},2:{r:"W",h:2,a:0},3:{r:"W",h:1,a:0}}},
 ];
 
 // ─────────────────────────────────────────────
@@ -1576,6 +1608,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
   const demoFiltered = showDemo ? DEMO_PLAYERS.filter(p=>!uploadedGroups.has(p.group)) : [];
   const all=[...demoFiltered,...uploaded];
   const fri=all.filter(p=>p.group==="friends_usa");
+  const co=all.filter(p=>p.group==="friends_co");
   const fam=all.filter(p=>p.group==="family");
 
   // Parse Google Sheet ID from URL or raw ID
@@ -1660,6 +1693,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
       const sheets = [
         {id:ENV_SHEET_USA, group:"friends_usa", label:"Amigos USA"},
         {id:ENV_SHEET_FAM, group:"family", label:"Familia"},
+        {id:ENV_SHEET_CO, group:"friends_co", label:"Amigos Colombia"},
       ];
 
       for(const sheet of sheets){
@@ -1735,7 +1769,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
       <div style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:16,padding:24,marginBottom:20}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:16}}>
           <div><div style={{fontFamily:fb,fontSize:32,letterSpacing:2,color:"#1B2A6B"}}>{sel.name}</div>
-            <span style={{fontSize:12,fontWeight:700,padding:"3px 12px",borderRadius:20,background:sel.group==="friends_usa"?"#1B2A6B15":"#C8102E15",color:sel.group==="friends_usa"?"#1B2A6B":"#C8102E",marginTop:6,display:"inline-block"}}>{sel.group==="friends_usa"?"Amigos USA":"Familia"}</span></div>
+            <span style={{fontSize:12,fontWeight:700,padding:"3px 12px",borderRadius:20,background:sel.group==="friends_usa"?"#1B2A6B15":sel.group==="friends_co"?"#D4A84320":"#C8102E15",color:sel.group==="friends_usa"?"#1B2A6B":sel.group==="friends_co"?"#B8860B":"#C8102E",marginTop:6,display:"inline-block"}}>{sel.group==="friends_usa"?"Amigos USA":sel.group==="friends_co"?"Amigos Colombia":"Familia"}</span></div>
           <div style={{textAlign:"center"}}><div style={{fontFamily:fb,fontSize:48,color:"#D4A843"}}>{pts.total}</div><div style={{fontSize:12,fontWeight:700,color:"#4B5563"}}>PUNTOS</div></div>
         </div>
         <div style={{display:"grid",gridTemplateColumns:mobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:10,marginTop:20}}>
@@ -1789,13 +1823,14 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
     </div>}
     {/* Filters */}
     <div style={{display:"flex",gap:6,marginBottom:20,alignItems:"center",flexWrap:"wrap"}}>
-      {[{id:"all",l:"Todos"},{id:"friends_usa",l:"Amigos USA"},{id:"family",l:"Familia"}].map(f=>(
+      {[{id:"all",l:"Todos"},{id:"friends_usa",l:"Amigos USA"},{id:"friends_co",l:"Amigos Colombia"},{id:"family",l:"Familia"}].map(f=>(
         <button key={f.id} onClick={()=>setFilter(f.id)} style={{padding:"7px 16px",borderRadius:8,border:"1px solid rgba(0,0,0,.08)",cursor:"pointer",fontSize:12,fontWeight:600,fontFamily:ff,background:filter===f.id?"#1B2A6B":"#FFFFFF",color:filter===f.id?"#FFFFFF":"#4B5563"}}>{f.l}</button>))}
       <label style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:12,color:"#4B5563"}}>
         <input type="checkbox" checked={showDemo} onChange={e=>setShowDemo(e.target.checked)}/> {t.showDemo}</label>
     </div>
     <div style={{display:"flex",flexDirection:"column",gap:24}}>
       {(filter==="all"||filter==="friends_usa")&&board(fri,t.friends_usa,"#1B2A6B","friends_usa")}
+      {(filter==="all"||filter==="friends_co")&&board(co,t.friends_co,"#D4A843","friends_co")}
       {(filter==="all"||filter==="family")&&board(fam,t.family,"#C8102E","family")}
       {fri.length===0&&fam.length===0&&<div style={{textAlign:"center",padding:40,color:"#4B5563"}}>{t.noPlayers}</div>}
     </div>
@@ -2011,28 +2046,15 @@ function savePref(key, val) {
 // ─────────────────────────────────────────────
 //  WELCOME SCREEN
 // ─────────────────────────────────────────────
-function WelcomeScreen({onComplete, players, lang, setLang}) {
-  const t=_t;
+function WelcomeScreen({onComplete, players}) {
   const [step, setStep] = useState(1);
   const [selTeam, setSelTeam] = useState(null);
   const [selName, setSelName] = useState(null);
   const [search, setSearch] = useState("");
 
   const filteredTeams = search
-    ? ALL_TEAMS.filter(tm => tm.name.toLowerCase().includes(search.toLowerCase()))
+    ? ALL_TEAMS.filter(t => t.name.toLowerCase().includes(search.toLowerCase()))
     : ALL_TEAMS;
-
-  // Deduplicate players by name, merge group labels
-  const groupLabel = (g) => g==="friends_usa"?"Amigos USA":"Familia";
-  const uniquePlayers = useMemo(() => {
-    const map = {};
-    players.forEach(p => {
-      if(!map[p.name]) map[p.name] = {name:p.name, groups:[]};
-      const gl = groupLabel(p.group);
-      if(!map[p.name].groups.includes(gl)) map[p.name].groups.push(gl);
-    });
-    return Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
-  }, [players]);
 
   const finish = () => {
     if(selTeam) savePref("team", selTeam);
@@ -2044,42 +2066,33 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
   return (
     <div style={{position:"fixed",inset:0,zIndex:9999,background:"linear-gradient(145deg,#1B2A6B 0%,#243A8E 50%,#1B2A6B 100%)",overflowY:"auto",WebkitOverflowScrolling:"touch",padding:20,display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
       <div style={{maxWidth:520,width:"100%",textAlign:"center",paddingTop:40,paddingBottom:40}}>
-        {/* Language toggle */}
-        <div style={{display:"flex",justifyContent:"center",gap:8,marginBottom:24}}>
-          {[{id:"es",label:"Español 🇪🇸"},{id:"en",label:"English 🇺🇸"}].map(l=>(
-            <button key={l.id} onClick={()=>setLang(l.id)} style={{
-              padding:"8px 20px",borderRadius:10,border:lang===l.id?"2px solid #D4A843":"2px solid rgba(255,255,255,.15)",
-              background:lang===l.id?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
-              color:lang===l.id?"#D4A843":"rgba(255,255,255,.7)",fontSize:14,fontWeight:700,cursor:"pointer",fontFamily:ff,
-            }}>{l.label}</button>
-          ))}
-        </div>
         {/* Logo */}
         <div style={{fontSize:64,marginBottom:8}}>⚽</div>
-        <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:32}}>{t.brandTitle}</div>
+        <div style={{fontFamily:fb,fontSize:36,letterSpacing:3,color:"#FFFFFF",marginBottom:4}}>Zona Mundialista 2026</div>
+        <div style={{fontSize:14,color:"rgba(255,255,255,.6)",marginBottom:32}}>Tu centro personal del Mundial</div>
 
         {step === 1 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ1}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>{t.welcomeQ1Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿A QUIÉN LE VAS?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:16}}>Escoge tu selección favorita</div>
 
             {/* Search */}
             <input
               type="text" value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder={t.welcomeSearch}
+              placeholder="Buscar equipo..."
               style={{width:"100%",padding:"10px 16px",borderRadius:12,border:"2px solid rgba(255,255,255,.15)",background:"rgba(255,255,255,.08)",color:"#FFFFFF",fontSize:14,fontFamily:ff,outline:"none",boxSizing:"border-box",marginBottom:16,textAlign:"center"}}
             />
 
             {/* Team grid */}
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,maxHeight:320,overflowY:"auto",padding:"4px 2px"}}>
-              {filteredTeams.map(tm => (
-                <button key={tm.name} onClick={()=>setSelTeam(tm.name)} style={{
-                  padding:"10px 4px",borderRadius:12,border:selTeam===tm.name?"2px solid #D4A843":"2px solid transparent",
-                  background:selTeam===tm.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
+              {filteredTeams.map(t => (
+                <button key={t.name} onClick={()=>setSelTeam(t.name)} style={{
+                  padding:"10px 4px",borderRadius:12,border:selTeam===t.name?"2px solid #D4A843":"2px solid transparent",
+                  background:selTeam===t.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
                   cursor:"pointer",textAlign:"center",transition:"all .15s",
                 }}>
-                  <div style={{fontSize:28}}>{tm.flag}</div>
-                  <div style={{fontSize:11,fontWeight:600,color:selTeam===tm.name?"#D4A843":"rgba(255,255,255,.8)",marginTop:4,lineHeight:1.2}}>{tm.name}</div>
+                  <div style={{fontSize:28}}>{t.flag}</div>
+                  <div style={{fontSize:11,fontWeight:600,color:selTeam===t.name?"#D4A843":"rgba(255,255,255,.8)",marginTop:4,lineHeight:1.2}}>{t.name}</div>
                 </button>
               ))}
             </div>
@@ -2087,34 +2100,34 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
             <button onClick={()=>setStep(2)} style={{
               marginTop:20,padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
               background:selTeam?"#D4A843":"rgba(255,255,255,.15)",color:selTeam?"#1B2A6B":"rgba(255,255,255,.4)",
-            }}>{selTeam ? t.welcomeNext : t.welcomeSkip}</button>
+            }}>{selTeam ? "Siguiente →" : "Saltar →"}</button>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>{t.welcomeQ2}</div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>{t.welcomeQ2Sub}</div>
+            <div style={{fontFamily:fb,fontSize:22,letterSpacing:2,color:"#D4A843",marginBottom:4}}>¿QUIÉN ERES?</div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.6)",marginBottom:20}}>Escoge tu nombre para ver tu posición en la Polla</div>
 
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
-              {uniquePlayers.map(p => (
-                <button key={p.name} onClick={()=>setSelName(p.name)} style={{
+              {players.map(p => (
+                <button key={p.name+"_"+p.group} onClick={()=>setSelName(p.name)} style={{
                   padding:"12px 8px",borderRadius:12,border:selName===p.name?"2px solid #D4A843":"2px solid transparent",
                   background:selName===p.name?"rgba(212,168,67,.15)":"rgba(255,255,255,.06)",
                   cursor:"pointer",textAlign:"center",transition:"all .15s",
                 }}>
                   <div style={{fontSize:14,fontWeight:600,color:selName===p.name?"#D4A843":"#FFFFFF"}}>{p.name}</div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,.4)",marginTop:2}}>{p.groups.join(" · ")}</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.4)",marginTop:2}}>{p.group==="friends_usa"?"Amigos USA":p.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </button>
               ))}
             </div>
 
             <div style={{display:"flex",gap:12,justifyContent:"center"}}>
-              <button onClick={()=>setStep(1)} style={{padding:"12px 24px",borderRadius:12,border:"1px solid rgba(255,255,255,.2)",background:"transparent",color:"rgba(255,255,255,.7)",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:600}}>{t.welcomeBack}</button>
+              <button onClick={()=>setStep(1)} style={{padding:"12px 24px",borderRadius:12,border:"1px solid rgba(255,255,255,.2)",background:"transparent",color:"rgba(255,255,255,.7)",cursor:"pointer",fontFamily:ff,fontSize:14,fontWeight:600}}>← Atrás</button>
               <button onClick={finish} style={{
                 padding:"12px 40px",borderRadius:12,border:"none",cursor:"pointer",fontFamily:ff,fontSize:15,fontWeight:700,
                 background:"#D4A843",color:"#1B2A6B",
-              }}>{selName ? `${t.welcomeEnterAs} ${selName}` : t.welcomeEnterNoName}</button>
+              }}>{selName ? `Entrar como ${selName}` : "Entrar sin nombre"}</button>
             </div>
           </div>
         )}
@@ -2124,10 +2137,9 @@ function WelcomeScreen({onComplete, players, lang, setLang}) {
 }
 
 export default function App() {
-  const [lang, setLang] = useState(()=>loadPref("lang","es"));
+  const [lang, setLang] = useState("es");
   const t=LANG[lang]||LANG.es;
   _t=t;
-  useEffect(()=>{savePref("lang",lang)},[lang]);
   const mobile = useIsMobile();
   const [appReady, setAppReady] = useState(false);
   const [userTeam, setUserTeam] = useState(()=>loadPref("team",null));
@@ -2194,7 +2206,6 @@ export default function App() {
 
   if(showWelcome) return <WelcomeScreen
     players={DEMO_PLAYERS}
-    lang={lang} setLang={setLang}
     onComplete={({team,name})=>{setUserTeam(team);setUserName(name);setShowWelcome(false);}}
   />;
 
@@ -2308,7 +2319,7 @@ export default function App() {
                 <div>
                   <div style={{fontSize:12,fontWeight:700,color:"#6B7280"}}>TU POSICIÓN EN LA POLLA</div>
                   <div style={{fontSize:14,fontWeight:700,color:"#1F2937"}}>{pollaRank.total} puntos</div>
-                  <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":"Familia"}</div>
+                  <div style={{fontSize:12,color:"#6B7280"}}>{pollaRank.pos} de {pollaRank.of} en {DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_usa"?"Amigos USA":DEMO_PLAYERS.find(p=>p.name===userName)?.group==="friends_co"?"Amigos Colombia":"Familia"}</div>
                 </div>
               </div>}
             </div>
