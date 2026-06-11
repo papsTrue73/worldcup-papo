@@ -493,17 +493,20 @@ function useIsMobile(bp=768) {
   return m;
 }
 
-const WC_START = new Date("2026-06-11T17:00:00-04:00").getTime();
+const WC_START = new Date("2026-06-11T15:00:00-04:00").getTime();
 function Countdown() {
+  const t=_t;
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(id); }, []);
   const diff = WC_START - now;
-  if(diff <= 0) return <span style={{fontSize:12,fontWeight:700,color:"#10b981"}}>⚽ EN VIVO</span>;
-  const days = Math.ceil(diff/86400000);
+  if(diff <= 0) return <span style={{fontSize:13,fontWeight:700,color:"#10b981"}}>{t.wcLive||"⚽ EN VIVO"}</span>;
+  const days = Math.floor(diff/86400000);
+  const hours = Math.floor((diff%86400000)/3600000);
+  const label = (t.daysToWC||"días para\nel Mundial").split("\\n");
   return (
     <div style={{display:"flex",alignItems:"center",gap:8}}>
-      <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days}</span>
-      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>días para<br/>el Mundial</span>
+      <span style={{fontFamily:fb,fontSize:28,color:"#D4A843",lineHeight:1}}>{days<1?`${hours}h`:days}</span>
+      <span style={{fontSize:12,color:"rgba(255,255,255,.7)",fontWeight:600,lineHeight:1.2}}>{label[0]}<br/>{label[1]||""}</span>
     </div>
   );
 }
@@ -1879,7 +1882,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!apiKey.trim()){setStatus({ok:false,msg:"Pega tu API key de football-data.org"});return}
     setLoading(true); setStatus(null);
     try {
-      const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches?season=2026"),{
+      const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches"),{
         headers:{"X-Auth-Token":apiKey.trim()}
       });
       if(!res.ok){
@@ -2006,7 +2009,7 @@ function FetchPanel({fixtures, onUpdate}) {
     if(!autoRefresh || !apiKey.trim()) return;
     const id = setInterval(async () => {
       try {
-        const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches?season=2026"),{
+        const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches"),{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
         if(!res.ok) return;
