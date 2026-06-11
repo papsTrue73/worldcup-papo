@@ -119,17 +119,46 @@ const LANG = {
     evGoal: "Gol", evPenalty: "Penal", evOwnGoal: "Autogol",
     evFreeKick: "Tiro Libre", evHeader: "Cabezazo", evFoul: "Falta",
     evYellow: "Tarjeta Amarilla", evRed: "Tarjeta Roja",
+    // Knockout
+    groupStage: "Fase de Grupos", knockoutStage: "Eliminatorias",
+    r32Label: "Octavos de Final (16 partidos)", bracketLabel: "Cuadro Final (R16 → Final)",
+    r32Short: "Octavos", bracketShort: "Cuadro Final",
+    roundR32: "Octavos", roundR16: "Cuartos", roundQF: "Semifinal", roundSF: "Semifinal",
+    roundFinal: "Final", roundThird: "3er Puesto",
+    // Welcome
+    welcomeQ1: "¿A QUIÉN LE VAS?", welcomeQ1Sub: "Escoge tu selección favorita",
+    welcomeQ2: "¿QUIÉN ERES?", welcomeQ2Sub: "Escoge tu nombre para ver tu posición en la Polla",
+    welcomeSearch: "Buscar equipo...", welcomeNext: "Siguiente →", welcomeSkip: "Saltar →",
+    welcomeBack: "← Atrás", welcomeEnterAs: "Entrar como", welcomeEnterNoName: "Entrar sin nombre",
+    // Status
+    apiConnectedLabel: "API Conectada", apiWaiting: "Esperando datos", apiNoKey: "Sin API key",
+    apiLoading: "Conectando...", apiRefresh: "↻ Actualizar", apiAuto: "Auto 60s",
+    // Home personal
+    nextMatch: "PRÓXIMO PARTIDO", yourPosition: "TU POSICIÓN EN LA POLLA",
+    posOf: "de", posIn: "en",
+    // Polla filters
+    pollaAll: "Todos", pollaUSA: "Amigos USA", pollaFam: "Familia",
+    connectingSheets: "Conectando con Google Sheets...",
+    noPredictions: "Sin predicciones disponibles.",
+    loadingPreds: "Cargando predicciones...",
+    // Countdown
+    daysToWC: "días para\nel Mundial", wcLive: "⚽ EN VIVO",
+    // Footer
+    changeTeam: "Cambiar equipo", pickTeam: "⚽ Elegir equipo",
+    // AI page
+    aiDesc: "Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data.",
+    aiDraw: "Empate",
   },
   en: {
-    brandSub: "Zona Mundialista",
-    brandTitle: "Zona Mundialista 2026",
+    brandSub: "WorldCup Zone",
+    brandTitle: "WorldCup Zone 2026",
     brandDesc: "Four connected views: Today's Games, Fixture Map, Statistics Center and Prediction Game.",
     dataMode: "Data mode:",
     apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
     simulate: "Simulate API refresh", reset: "Reset data",
     matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
-    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Polla",
+    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Bracket",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
     todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
     todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
@@ -203,6 +232,35 @@ const LANG = {
     evGoal: "Goal", evPenalty: "Penalty", evOwnGoal: "Own Goal",
     evFreeKick: "Free Kick", evHeader: "Header", evFoul: "Foul",
     evYellow: "Yellow Card", evRed: "Red Card",
+    // Knockout
+    groupStage: "Group Stage", knockoutStage: "Knockout Stage",
+    r32Label: "Round of 32 (16 matches)", bracketLabel: "Final Bracket (R16 → Final)",
+    r32Short: "Round of 32", bracketShort: "Final Bracket",
+    roundR32: "R32", roundR16: "R16", roundQF: "Quarterfinal", roundSF: "Semifinal",
+    roundFinal: "Final", roundThird: "3rd Place",
+    // Welcome
+    welcomeQ1: "WHO ARE YOU ROOTING FOR?", welcomeQ1Sub: "Pick your favorite team",
+    welcomeQ2: "WHO ARE YOU?", welcomeQ2Sub: "Pick your name to see your Bracket ranking",
+    welcomeSearch: "Search team...", welcomeNext: "Next →", welcomeSkip: "Skip →",
+    welcomeBack: "← Back", welcomeEnterAs: "Enter as", welcomeEnterNoName: "Enter without name",
+    // Status
+    apiConnectedLabel: "API Connected", apiWaiting: "Waiting for data", apiNoKey: "No API key",
+    apiLoading: "Connecting...", apiRefresh: "↻ Refresh", apiAuto: "Auto 60s",
+    // Home personal
+    nextMatch: "NEXT MATCH", yourPosition: "YOUR BRACKET POSITION",
+    posOf: "of", posIn: "in",
+    // Polla filters
+    pollaAll: "All", pollaUSA: "Friends USA", pollaFam: "Family",
+    connectingSheets: "Connecting to Google Sheets...",
+    noPredictions: "No predictions available.",
+    loadingPreds: "Loading predictions...",
+    // Countdown
+    daysToWC: "days to\nWorld Cup", wcLive: "⚽ LIVE",
+    // Footer
+    changeTeam: "Change team", pickTeam: "⚽ Pick team",
+    // AI page
+    aiDesc: "AI-generated predictions (CatBoost ML) powered by Bzzoiro Sports Data.",
+    aiDraw: "Draw",
   }
 };
 
