@@ -1613,7 +1613,7 @@ function calcPts(player, fixtures) {
   return {rPts,ePts,gPts,total:rPts+ePts+gPts,rCount,eCount};
 }
 
-function PredictionsPage({fixtures,uploaded,setUploaded}) {
+function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
   const t=_t;
   const mobile=useIsMobile();
   const [sel,setSel]=useState(null);
@@ -1734,6 +1734,32 @@ function PredictionsPage({fixtures,uploaded,setUploaded}) {
       }
 
       if(allPlayers.length === 0) throw new Error("No se encontraron jugadores con predicciones. Verifica que las hojas estén publicadas.");
+
+      // Read "Official Results" tab from the first available sheet to get actual scores
+      const resultsSheetId = ENV_SHEET_USA || ENV_SHEET_FAM;
+      if(resultsSheetId && setFixtures) {
+        try {
+          const resultRows = await fetchCsv(resultsSheetId, "Official Results");
+          if(resultRows.length > 1) {
+            setFixtures(prev => {
+              const next = [...prev];
+              for(let r=1; r<resultRows.length; r++) {
+                const row = resultRows[r];
+                const matchId = (row[0]||"").replace("M","");
+                const matchIdx = parseInt(matchId) - 1;
+                if(isNaN(matchIdx) || matchIdx < 0 || matchIdx >= next.length) continue;
+                const scoreA = parseInt(row[2]);
+                const scoreB = parseInt(row[3]);
+                const status = (row[6]||"").toUpperCase();
+                if(isNaN(scoreA) || isNaN(scoreB)) continue; // no scores yet
+                const st = status==="FINISHED"?"ft":status==="IN_PLAY"?"live":status==="PAUSED"?"live":"ft";
+                next[matchIdx] = {...next[matchIdx], homeScore:scoreA, awayScore:scoreB, status:st};
+              }
+              return next;
+            });
+          }
+        } catch(e) { console.warn("Could not read Official Results:", e.message); }
+      }
 
       setUploaded(allPlayers);
       setSheetConnected(true);
@@ -2379,7 +2405,7 @@ export default function App() {
         {page==="fixtures" && <FixturesPage fixtures={fixtures} onSelect={handleFixtureSelect}/>}
         {page==="stats" && <StatsPage fixtures={fixtures}/>}
         {page==="ai" && <AIPredsPage/>}
-        {page==="predictions" && <PredictionsPage fixtures={fixtures} uploaded={uploaded} setUploaded={setUploaded}/>}
+        {page==="predictions" && <PredictionsPage fixtures={fixtures} uploaded={uploaded} setUploaded={setUploaded} setFixtures={setFixtures}/>}
       </div>
 
       {/* ─── EDIT MODAL ─── */}
