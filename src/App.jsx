@@ -1331,9 +1331,7 @@ function StatsPage({fixtures}) {
 
     {/* Overview row */}
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginBottom:24}}>
-      {[{v:done.length,l:"Partidos Jugados",c:"#1B2A6B"},{v:totalGoals,l:"Goles Anotados",c:"#C8102E"},
-        {v:done.length>0?(totalGoals/done.length).toFixed(1):"—",l:"Goles / Partido",c:"#009B3A"},
-        {v:goals.length,l:"Total de Goles",c:"#D4A843"},{v:yellows,l:"Tarjetas Amarillas",c:"#CA8A04"},{v:reds,l:"Tarjetas Rojas",c:"#ef4444"},
+      {[{v:done.length,l:t.matchesPlayed||"Partidos Jugados",c:"#1B2A6B"}
       ].map(x=>(
         <div key={x.l} style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:14,padding:"16px 12px",textAlign:"center"}}>
           <div style={{fontFamily:fb,fontSize:32,color:x.c}}>{x.v}</div>
@@ -1343,53 +1341,6 @@ function StatsPage({fixtures}) {
     </div>
 
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}}>
-      {/* Top scorers */}
-      <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:12}}>{t.topScorers}</div>
-        {topScorers.length===0?<div style={{color:"#6B7280",fontSize:12}}>{t.noGoals}</div>:
-        topScorers.map((s,i)=>(
-          <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #F3F4F6",cursor:"pointer"}}
-            onClick={()=>selectTeam(s.team)}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{width:20,height:20,borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:700,
-                background:i===0?"rgba(245,158,11,.2)":i<3?"rgba(16,185,129,.15)":"rgba(0,0,0,.06)",
-                color:i===0?"#D4A843":i<3?"#10b981":"#64748b"}}>{i+1}</span>
-              <span style={{fontSize:20}}>{team(s.team).flag}</span>
-              <div><div style={{fontSize:13,fontWeight:600}}>{s.name}</div><div style={{fontSize:12,color:"#4B5563"}}>{s.team}</div></div>
-            </div>
-            <span style={{fontFamily:fb,fontSize:22,color:"#D4A843"}}>{s.goals}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* POTM */}
-      <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:12}}>{t.potmAwards}</div>
-        {topPotm.length===0?<div style={{color:"#6B7280",fontSize:12}}>{t.noAwards}</div>:
-        topPotm.map(([n,c],i)=>(
-          <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #F3F4F6"}}>
-            <div style={{display:"flex",alignItems:"center",gap:6}}><span style={{color:"#D4A843"}}>⭐</span><span style={{fontSize:13,fontWeight:500}}>{n}</span></div>
-            <span style={{fontSize:12,color:"#D4A843",fontWeight:700}}>{c}×</span></div>
-        ))}
-      </div>
-
-      {/* Top attacking teams */}
-      <div style={card()}>
-        <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:12}}>{t.topAttacking}</div>
-        {topAttack.length===0?<div style={{color:"#6B7280",fontSize:12}}>{t.noData}</div>:
-        topAttack.map((t,i)=>(
-          <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #F3F4F6",cursor:"pointer"}}
-            onClick={()=>selectTeam(t.name)}>
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{fontSize:18}}>{team(t.name).flag}</span>
-              <div><div style={{fontSize:13,fontWeight:600}}>{t.name}</div>
-                <div style={{fontSize:12,color:"#4B5563"}}>{t.shots} tiros · {t.sot} a puerta · {t.corners}esquinas</div></div>
-            </div>
-            <span style={{fontFamily:fb,fontSize:22,color:"#10b981"}}>{t.gf}</span>
-          </div>
-        ))}
-      </div>
-
       {/* Group leaders */}
       <div style={card()}>
         <div style={{fontFamily:fb,fontSize:18,letterSpacing:2,color:"#1B2A6B",marginBottom:12}}>{t.groupLeaders}</div>
