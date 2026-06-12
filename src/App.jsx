@@ -8,11 +8,9 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 // Proxy-aware API URLs (proxy only works in Vite dev server)
 const IS_DEV=typeof window!=="undefined"&&window.location.hostname==="localhost";
 const FOOTBALL_URL=(path)=>IS_DEV?`/api/football${path}`:`/api/football?path=${encodeURIComponent(path)}`;
-const BSD_URL=(path)=>IS_DEV?`/api/bsd${path}`:`/api/bsd?path=${encodeURIComponent(path)}`;
 
-let ENV_FOOTBALL_KEY="",ENV_BSD_KEY="",ENV_SHEET_USA="",ENV_SHEET_FAM="";
+let ENV_FOOTBALL_KEY="",ENV_SHEET_USA="",ENV_SHEET_FAM="";
 try{ENV_FOOTBALL_KEY=WCENV_FOOTBALL}catch(e){}
-try{ENV_BSD_KEY=WCENV_BSD}catch(e){}
 try{ENV_SHEET_USA=WCENV_SHEET_USA}catch(e){}
 try{ENV_SHEET_FAM=WCENV_SHEET_FAM}catch(e){}
 const ENV_HAS_SHEETS = !!(ENV_SHEET_USA||ENV_SHEET_FAM);
@@ -32,7 +30,7 @@ const LANG = {
     matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
     finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
     // Nav
-    navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navAI: "Predicciones", navPolla: "Polla",
+    navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navPolla: "Polla",
     // Status
     statusFt: "Final", statusLive: "En Vivo", statusUpcoming: "Próximo",
     // Home
@@ -158,7 +156,7 @@ const LANG = {
     simulate: "Simulate API refresh", reset: "Reset data",
     matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
-    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navAI: "Predictions", navPolla: "Bracket",
+    navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navPolla: "Bracket",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
     todayGames: "TODAY'S GAMES", liveNow: "LIVE NOW", completed: "COMPLETED", comingNext: "COMING NEXT",
     todayDesc: "Games grouped by day, with live scores and status updates. Click a match to see full details.",
@@ -1384,169 +1382,6 @@ function StatBar({label,value,max,color}) {
 //  PAGE 4: PREDICTIONS
 // ─────────────────────────────────────────────
 // ─────────────────────────────────────────────
-//  PAGE: AI PREDICTIONS (BSD)
-// ─────────────────────────────────────────────
-const DEMO_AI_PREDS = [
-  {home:"Mexico",away:"South Africa",date:"Jun 11",group:"A",homeWin:58,draw:24,awayWin:18,btts:42,over25:55,
-    oddsH:"1.72",oddsD:"3.40",oddsA:"5.25",homeForm:"WWDWW",awayForm:"WLDLD",
-    insight:"México llega como favorito en casa. Historial reciente dominante en partidos inaugurales."},
-  {home:"South Korea",away:"Czechia",date:"Jun 11",group:"A",homeWin:38,draw:30,awayWin:32,btts:48,over25:51,
-    oddsH:"2.45",oddsD:"3.20",oddsA:"2.90",homeForm:"WDWLD",awayForm:"DWWDL",
-    insight:"Partido muy parejo. Ambos equipos con rendimiento similar en clasificatorias."},
-  {home:"Canada",away:"Bosnia & Herz.",date:"Jun 12",group:"B",homeWin:52,draw:26,awayWin:22,btts:45,over25:48,
-    oddsH:"1.90",oddsD:"3.30",oddsA:"4.10",homeForm:"WWWDL",awayForm:"LDWDW",
-    insight:"Canadá con ventaja de local. Bosnia peligrosa en contraataque."},
-  {home:"USA",away:"Paraguay",date:"Jun 12",group:"D",homeWin:62,draw:22,awayWin:16,btts:38,over25:52,
-    oddsH:"1.55",oddsD:"3.80",oddsA:"6.50",homeForm:"WWWWW",awayForm:"WDLDW",
-    insight:"EE.UU. gran favorito en casa. Paraguay busca la sorpresa con bloque defensivo."},
-  {home:"Brazil",away:"Morocco",date:"Jun 13",group:"C",homeWin:55,draw:25,awayWin:20,btts:52,over25:60,
-    oddsH:"1.78",oddsD:"3.50",oddsA:"4.60",homeForm:"WWDWW",awayForm:"WWWDW",
-    insight:"Brasil favorito pero Marruecos viene de un gran Mundial 2022. Partido abierto."},
-  {home:"Germany",away:"Curaçao",date:"Jun 14",group:"E",homeWin:88,draw:8,awayWin:4,btts:28,over25:78,
-    oddsH:"1.08",oddsD:"10.0",oddsA:"28.0",homeForm:"WWWWW",awayForm:"WLDLL",
-    insight:"Dominio total esperado de Alemania. Curaçao busca minimizar la diferencia."},
-  {home:"Netherlands",away:"Japan",date:"Jun 14",group:"F",homeWin:45,draw:28,awayWin:27,btts:55,over25:58,
-    oddsH:"2.15",oddsD:"3.30",oddsA:"3.40",homeForm:"WDWWL",awayForm:"WWWWW",
-    insight:"Japón en su mejor momento. Países Bajos con la calidad pero Japón es impredecible."},
-  {home:"Argentina",away:"Algeria",date:"Jun 16",group:"J",homeWin:75,draw:16,awayWin:9,btts:35,over25:58,
-    oddsH:"1.28",oddsD:"5.50",oddsA:"11.0",homeForm:"WWWWW",awayForm:"DWWLD",
-    insight:"Argentina campeón vigente. Argelia competitiva pero la diferencia de calidad es grande."},
-];
-
-function AIPredsPage() {
-  const t=_t;
-  const mobile=useIsMobile();
-  const [bsdKey, setBsdKey] = useState(ENV_BSD_KEY);
-  const [bsdPreds, setBsdPreds] = useState([]);
-  const [bsdLoading, setBsdLoading] = useState(false);
-  const [bsdMsg, setBsdMsg] = useState(null);
-  const [bsdConnected, setBsdConnected] = useState(false);
-  const [showDemo, setShowDemo] = useState(true);
-
-  const preds = bsdConnected ? bsdPreds : (showDemo ? DEMO_AI_PREDS : []);
-
-  const fetchBSD = useCallback(async () => {
-    if(!bsdKey.trim()){setBsdMsg({ok:false,msg:t.apiKeyFirst || "Ingresa la API key"});return}
-    setBsdLoading(true); setBsdMsg(null);
-    try {
-      const res = await fetch(BSD_URL("/api/events/?competition=world-cup"),{
-        headers:{"Authorization":`Token ${bsdKey.trim()}`}
-      });
-      if(!res.ok) throw new Error(`HTTP ${res.status} — Verifica tu API key`);
-      const data = await res.json();
-      const events = data.results || data || [];
-      const mapped = events.map(e=>({
-        home: e.home_team || "?", away: e.away_team || "?",
-        date: e.start_time ? new Date(e.start_time).toLocaleDateString() : "?",
-        group: e.group || "",
-        homeWin: Math.round((e.predictions?.home_win || e.odds_home_prob || 0)*100),
-        draw: Math.round((e.predictions?.draw || e.odds_draw_prob || 0)*100),
-        awayWin: Math.round((e.predictions?.away_win || e.odds_away_prob || 0)*100),
-        btts: Math.round((e.predictions?.btts || 0)*100),
-        over25: Math.round((e.predictions?.over_25 || 0)*100),
-        oddsH: e.odds_home || "—", oddsD: e.odds_draw || "—", oddsA: e.odds_away || "—",
-        homeForm: e.home_form || "", awayForm: e.away_form || "",
-        insight: e.predictions?.insight || "",
-      })).filter(e=>e.homeWin>0);
-      setBsdPreds(mapped);
-      setBsdConnected(true);
-      setBsdMsg({ok:true, msg:`${mapped.length} predicciones cargadas desde BSD`});
-    } catch(err) {
-      setBsdMsg({ok:false, msg:err.message});
-    }
-    setBsdLoading(false);
-  },[bsdKey]);
-
-  // Auto-fetch on mount if BSD key is available
-  useEffect(() => { if(ENV_BSD_KEY) fetchBSD(); }, []);
-
-  const ProbBar = ({label,pct,color}) => (
-    <div style={{flex:1,textAlign:"center"}}>
-      <div style={{fontSize:13,fontWeight:700,color,marginBottom:4}}>{pct}%</div>
-      <div style={{height:6,borderRadius:3,background:"#E5E7EB",overflow:"hidden"}}>
-        <div style={{height:"100%",borderRadius:3,background:color,width:`${pct}%`,transition:"width .5s"}}/>
-      </div>
-      <div style={{fontSize:12,color:"#6B7280",marginTop:4}}>{label}</div>
-    </div>
-  );
-
-  return (
-    <div style={{padding:"20px 0"}}>
-      <div style={{fontFamily:fb,fontSize:28,letterSpacing:2,color:"#1B2A6B",marginBottom:4}}>
-        {t.navAI || "PREDICCIONES AI"}
-      </div>
-      <div style={{fontSize:13,color:"#6B7280",marginBottom:12}}>
-        Predicciones generadas por inteligencia artificial (CatBoost ML) con datos de Bzzoiro Sports Data. Probabilidades de victoria, empate, goles y cuotas de múltiples casas de apuestas.
-      </div>
-      {bsdMsg && <div style={{marginBottom:16,fontSize:12,fontWeight:600,padding:"8px 14px",borderRadius:8,display:"inline-flex",alignItems:"center",gap:6,
-        background:bsdMsg.ok?"#10b98110":"#ef444410",color:bsdMsg.ok?"#10b981":"#ef4444"}}>
-        {bsdConnected && <span style={{width:6,height:6,borderRadius:3,background:"#10b981"}}/>}{bsdMsg.msg}
-      </div>}
-
-      {/* Predictions Grid */}
-      {preds.length===0 ? (
-        <div style={{textAlign:"center",padding:40,color:"#6B7280",fontSize:14}}>
-          {bsdLoading ? "Cargando predicciones..." : "Sin predicciones disponibles."}
-        </div>
-      ) : (
-        <div style={{display:"grid",gridTemplateColumns:mobile?"1fr":"repeat(auto-fill,minmax(380px,1fr))",gap:16}}>
-          {preds.map((p,i)=>{
-            const ht=team(p.home), at=team(p.away);
-            const maxProb = Math.max(p.homeWin,p.draw,p.awayWin);
-            return (
-              <div key={i} style={{background:"#FFFFFF",border:"1px solid rgba(0,0,0,.08)",borderRadius:16,overflow:"hidden",boxShadow:"0 1px 3px rgba(0,0,0,.06)"}}>
-                {/* Header */}
-                <div style={{padding:"12px 16px",background:"#F9FAFB",borderBottom:"1px solid #F3F4F6",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                  <span style={{fontSize:12,fontWeight:600,color:"#6B7280",letterSpacing:1}}>
-                    {p.group ? `GRUPO ${p.group} · `:""}{p.date}
-                  </span>
-                  <span style={{fontSize:12,fontWeight:700,padding:"2px 10px",borderRadius:12,background:"#1B2A6B10",color:"#1B2A6B"}}>🤖 AI</span>
-                </div>
-                {/* Teams */}
-                <div style={{padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
-                  <div style={{textAlign:"center",flex:1}}>
-                    <div style={{fontSize:28}}>{ht.flag}</div>
-                    <div style={{fontSize:13,fontWeight:700,color:"#1F2937",marginTop:4}}>{p.home}</div>
-                    {p.homeForm && <div style={{fontSize:12,color:"#6B7280",marginTop:2,letterSpacing:2}}>{p.homeForm}</div>}
-                  </div>
-                  <div style={{fontFamily:fb,fontSize:20,color:"#9CA3AF",letterSpacing:2}}>VS</div>
-                  <div style={{textAlign:"center",flex:1}}>
-                    <div style={{fontSize:28}}>{at.flag}</div>
-                    <div style={{fontSize:13,fontWeight:700,color:"#1F2937",marginTop:4}}>{p.away}</div>
-                    {p.awayForm && <div style={{fontSize:12,color:"#6B7280",marginTop:2,letterSpacing:2}}>{p.awayForm}</div>}
-                  </div>
-                </div>
-                {/* Probability bars */}
-                <div style={{padding:"0 16px 12px",display:"flex",gap:12}}>
-                  <ProbBar label={p.home} pct={p.homeWin} color={p.homeWin===maxProb?"#1B2A6B":"#9CA3AF"}/>
-                  <ProbBar label="Empate" pct={p.draw} color={p.draw===maxProb?"#D4A843":"#9CA3AF"}/>
-                  <ProbBar label={p.away} pct={p.awayWin} color={p.awayWin===maxProb?"#C8102E":"#9CA3AF"}/>
-                </div>
-                {/* Odds + markets */}
-                <div style={{padding:"12px 16px",background:"#F9FAFB",borderTop:"1px solid #F3F4F6"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-                    <div style={{display:"flex",gap:8}}>
-                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#1B2A6B10",color:"#1B2A6B",fontWeight:700}}>1: {p.oddsH}</span>
-                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#D4A84320",color:"#B8860B",fontWeight:700}}>X: {p.oddsD}</span>
-                      <span style={{fontSize:12,padding:"2px 10px",borderRadius:6,background:"#C8102E10",color:"#C8102E",fontWeight:700}}>2: {p.oddsA}</span>
-                    </div>
-                    <div style={{display:"flex",gap:6}}>
-                      {p.btts>0 && <span style={{fontSize:12,padding:"2px 8px",borderRadius:6,background:"#10b98110",color:"#10b981",fontWeight:600}}>BTTS {p.btts}%</span>}
-                      {p.over25>0 && <span style={{fontSize:12,padding:"2px 8px",borderRadius:6,background:"#7c3aed10",color:"#6B3FA0",fontWeight:600}}>O2.5 {p.over25}%</span>}
-                    </div>
-                  </div>
-                  {p.insight && <div style={{fontSize:12,color:"#4B5563",lineHeight:1.5,fontStyle:"italic"}}>💡 {p.insight}</div>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────
 //  PAGE 5: POLLA MUNDIALISTA
 // ─────────────────────────────────────────────
 function calcPts(player, fixtures) {
@@ -2197,7 +2032,11 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(()=>!loadPref("onboarded",false));
   const [fixtures, setFixtures] = useState(initFixtures);
   const [page, setPage] = useState("home");
-  const [selectedDate, setSelectedDate] = useState("Jun 11");
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return months[now.getMonth()] + " " + now.getDate();
+  });
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [editMatch, setEditMatch] = useState(null);
   const [demoMode, setDemoMode] = useState(false);
@@ -2219,7 +2058,7 @@ export default function App() {
       return next;
     });
     setDemoMode(true);
-    setSelectedDate("Jun 11");
+    setSelectedDate(() => { const n=new Date(); const m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; return m[n.getMonth()]+" "+n.getDate(); });
     // Auto-select first match
     setTimeout(()=>{
       setSelectedMatch(prev => prev || null);
@@ -2302,7 +2141,7 @@ export default function App() {
           {/* Row 2: Nav + Actions */}
           <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
             <div style={{display:"flex",gap:2,background:"rgba(255,255,255,.08)",borderRadius:8,padding:2,overflowX:"auto",WebkitOverflowScrolling:"touch",flex:mobile?1:"none"}}>
-              {[{id:"home",label:t.navHome},{id:"fixtures",label:t.navFixtures},{id:"stats",label:t.navStats},{id:"ai",label:t.navAI},{id:"predictions",label:t.navPolla}].map(t=>(
+              {[{id:"home",label:t.navHome},{id:"fixtures",label:t.navFixtures},{id:"stats",label:t.navStats},{id:"predictions",label:t.navPolla}].map(t=>(
                 <button key={t.id} onClick={()=>setPage(t.id)} style={{
                   padding:mobile?"5px 8px":"6px 14px",borderRadius:8,border:"none",cursor:"pointer",fontFamily:ff,fontSize:mobile?12:13,fontWeight:600,
                   whiteSpace:"nowrap",transition:"all .15s",
@@ -2328,7 +2167,6 @@ export default function App() {
       <div style={{background:"#FFFFFF",borderBottom:"1px solid #E5E7EB",padding:"6px 24px",display:"flex",alignItems:"center",justifyContent:"center",gap:mobile?12:24}}>
         {[
           {label:"Marcadores",key:ENV_FOOTBALL_KEY,icon:"⚽"},
-          {label:"Predicciones AI",key:ENV_BSD_KEY,icon:"🤖"},
           {label:"Google Sheets",key:ENV_HAS_SHEETS?"1":"",icon:"📊"},
         ].map(s=>{
           const configured = !!s.key;
@@ -2379,7 +2217,6 @@ export default function App() {
         {page==="home" && <HomePage fixtures={fixtures} selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedMatch={liveSelected} setSelectedMatch={setSelectedMatch} onEdit={setEditMatch}/>}
         {page==="fixtures" && <FixturesPage fixtures={fixtures} onSelect={handleFixtureSelect}/>}
         {page==="stats" && <StatsPage fixtures={fixtures}/>}
-        {page==="ai" && <AIPredsPage/>}
         {page==="predictions" && <PredictionsPage fixtures={fixtures} uploaded={uploaded} setUploaded={setUploaded} setFixtures={setFixtures}/>}
       </div>
 
