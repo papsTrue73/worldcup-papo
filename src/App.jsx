@@ -1896,6 +1896,7 @@ function FetchPanel({fixtures, onUpdate}) {
   const [loading, setLoading] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [failCount, setFailCount] = useState(0);
 
   const mapEstado = (s) => {
     if(["FINISHED","AWARDED"].includes(s)) return "ft";
@@ -1905,19 +1906,36 @@ function FetchPanel({fixtures, onUpdate}) {
 
   // Step 1: Fetch all matches (scores + status)
   const fetchMatches = useCallback(async () => {
-    if(!apiKey.trim()){setStatus({ok:false,msg:"Pega tu API key de football-data.org"});return}
+    if(!apiKey.trim()){setStatus({ok:false,msg:"Sin API key — los marcadores vienen de Google Sheets"});return}
     setLoading(true); setStatus(null);
     try {
       const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches"),{
         headers:{"X-Auth-Token":apiKey.trim()}
       });
-      if(!res.ok){
-        if(res.status===403) throw new Error("API key inválida o expirada");
-        if(res.status===429) throw new Error("Límite de solicitudes — espera 60s e intenta de nuevo");
-        throw new Error(`HTTP ${res.status}`);
-      }
       const data = await res.json();
+
+      // Handle error response from serverless function
+      if(data.error) {
+        setFailCount(c=>c+1);
+        if(data.status===403||data.status===400) {
+          setAutoRefresh(false); // stop polling on permission errors
+          setStatus({ok:false, msg:"API no disponible en tier gratuito — marcadores vía Google Sheets"});
+        } else {
+          setStatus({ok:false, msg:data.message||`Error ${data.status}`});
+        }
+        setLoading(false);
+        return;
+      }
+
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
       const matches = data.matches || [];
+      if(matches.length===0){
+        setStatus({ok:false, msg:"Sin datos de partidos todavía"});
+        setLoading(false);
+        return;
+      }
+
       const next = [...fixtures];
       let updated = 0;
 
@@ -1931,24 +1949,26 @@ function FetchPanel({fixtures, onUpdate}) {
         const idx = next.findIndex(f => f.home===homeName && f.away===awayName);
         if(idx===-1) return;
         const f = next[idx];
-        if(f.status===st && f.homeScore===m.score?.fullTime?.home) return; // no change
+        if(f.status===st && f.homeScore===m.score?.fullTime?.home) return;
 
         next[idx] = {...f,
           status: st,
           homeScore: m.score?.fullTime?.home ?? 0,
           awayScore: m.score?.fullTime?.away ?? 0,
-          _apiMatchId: m.id, // store for detail fetch
+          _apiMatchId: m.id,
         };
         updated++;
       });
 
+      setFailCount(0); // reset on success
       if(updated > 0) {
         onUpdate(next);
-        setStatus({ok:true, msg:`${updated} partido(s) actualizados. Haz clic en "Obtener Detalles" para eventos y estadísticas.`});
+        setStatus({ok:true, msg:`${updated} partido(s) actualizados`});
       } else {
-        setStatus({ok:false, msg:"Sin resultados nuevos. El torneo inicia el 11 de junio de 2026."});
+        setStatus({ok:true, msg:`API conectada — ${matches.length} partidos, sin cambios`});
       }
     } catch(err) {
+      setFailCount(c=>c+1);
       setStatus({ok:false, msg: err.message});
     }
     setLoading(false);
@@ -2030,17 +2050,21 @@ function FetchPanel({fixtures, onUpdate}) {
     if(ENV_FOOTBALL_KEY && !loading) fetchMatches();
   }, []);
 
-  // Auto-refresh polling
+  // Auto-refresh polling — stops after 3 consecutive failures
   useEffect(() => {
-    if(!autoRefresh || !apiKey.trim()) return;
+    if(!autoRefresh || !apiKey.trim() || failCount >= 3) {
+      if(failCount >= 3) setAutoRefresh(false);
+      return;
+    }
     const id = setInterval(async () => {
       try {
         const res = await fetch(FOOTBALL_URL("/v4/competitions/WC/matches"),{
           headers:{"X-Auth-Token":apiKey.trim()}
         });
-        if(!res.ok) return;
         const data = await res.json();
+        if(data.error) { setFailCount(c=>c+1); return; }
         const matches = data.matches || [];
+        if(matches.length===0) return;
         const next = [...fixtures];
         let updated = 0;
         matches.forEach(m => {
@@ -2053,11 +2077,11 @@ function FetchPanel({fixtures, onUpdate}) {
             updated++;
           }
         });
-        if(updated > 0) { onUpdate(next); setStatus({ok:true, msg:`Auto-refresh: ${updated} actualizado(s)`}); }
-      } catch(e) { /* silent */ }
+        if(updated > 0) { onUpdate(next); setFailCount(0); setStatus({ok:true, msg:`Auto-refresh: ${updated} actualizado(s)`}); }
+      } catch(e) { setFailCount(c=>c+1); }
     }, 60000);
     return () => clearInterval(id);
-  }, [autoRefresh, apiKey, fixtures, onUpdate]);
+  }, [autoRefresh, apiKey, fixtures, onUpdate, failCount]);
 
   const hasKey = !!apiKey.trim();
   const isConnected = hasKey && status?.ok;
