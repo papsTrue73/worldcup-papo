@@ -1460,6 +1460,39 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
     return rows;
   };
 
+  // Normalize team names (handles Spanish names from sheets + English names from fixtures)
+  const TEAM_NORM = {
+    "méxico":"mexico","sudáfrica":"south africa","corea del sur":"south korea",
+    "chequia":"czechia","canadá":"canada","bosnia y herzegovina":"bosnia & herz.",
+    "bosnia-herzegovina":"bosnia & herz.","estados unidos":"usa","united states":"usa",
+    "catar":"qatar","suiza":"switzerland","haití":"haiti","escocia":"scotland",
+    "turquía":"türkiye","turkey":"türkiye","alemania":"germany","curazao":"curaçao",
+    "curacao":"curaçao","países bajos":"netherlands","japón":"japan",
+    "costa de marfil":"ivory coast","côte d'ivoire":"ivory coast",
+    "suecia":"sweden","túnez":"tunisia","españa":"spain",
+    "cabo verde":"cape verde","cape verde islands":"cape verde",
+    "bélgica":"belgium","egipto":"egypt","arabia saudita":"saudi arabia",
+    "irán":"iran","nueva zelanda":"new zealand","francia":"france",
+    "irak":"iraq","noruega":"norway","argelia":"algeria","jordania":"jordan",
+    "rd congo":"dr congo","congo dr":"dr congo","inglaterra":"england",
+    "croacia":"croatia","panamá":"panama","uzbekistán":"uzbekistan",
+  };
+  const normTeam = (n) => {
+    const lower = (n||"").trim().toLowerCase();
+    return TEAM_NORM[lower] || lower;
+  };
+
+  // Find fixture index by team names
+  const findFixtureIdx = (teamA, teamB, fixturesList) => {
+    const nA = normTeam(teamA);
+    const nB = normTeam(teamB);
+    return fixturesList.findIndex(f => {
+      const fH = normTeam(f.home);
+      const fA = normTeam(f.away);
+      return fH === nA && fA === nB;
+    });
+  };
+
   // Parse a master sheet's "Imported Picks" tab
   // Format: Friend(0), Section(1), MatchNum(2), Date(3), Group(4), TeamA(5), TeamB(6), ScoreA(7), ScoreB(8), ...
   const parseMasterSheet = async (sheetId, groupTag) => {
@@ -1475,8 +1508,13 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
       const name = (row[0]||"").trim();
       if(!name) continue;
 
-      const matchNum = parseInt(row[2]);
-      if(isNaN(matchNum) || matchNum<1 || matchNum>104) continue;
+      const teamA = (row[5]||"").trim(); // Spanish team name
+      const teamB = (row[6]||"").trim();
+      if(!teamA || !teamB) continue;
+
+      // Find the matching fixture by team names
+      const fixtureIdx = findFixtureIdx(teamA, teamB, fixtures);
+      if(fixtureIdx === -1) continue; // no matching fixture found
 
       // Create player if new
       if(!players[name]){
@@ -1486,12 +1524,12 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
       // Parse predicted scores (columns 7 and 8)
       const hVal = parseInt(row[7]);
       const aVal = parseInt(row[8]);
-      if(isNaN(hVal) && isNaN(aVal)) continue; // no prediction yet
+      if(isNaN(hVal) && isNaN(aVal)) continue;
 
       const h = isNaN(hVal) ? 0 : hVal;
       const a = isNaN(aVal) ? 0 : aVal;
       const result = h > a ? "W" : h < a ? "L" : "D";
-      players[name].matches[matchNum-1] = {r:result, h, a};
+      players[name].matches[fixtureIdx] = {r:result, h, a};
     }
 
     return Object.values(players);
@@ -1529,17 +1567,22 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
           if(resultRows.length > 1) {
             setFixtures(prev => {
               const next = [...prev];
+              let updated = 0;
               for(let r=1; r<resultRows.length; r++) {
                 const row = resultRows[r];
-                const matchId = (row[0]||"").replace("M","");
-                const matchIdx = parseInt(matchId) - 1;
-                if(isNaN(matchIdx) || matchIdx < 0 || matchIdx >= next.length) continue;
+                const teamA = (row[1]||"").trim();
+                const teamB = (row[4]||"").trim();
                 const scoreA = parseInt(row[2]);
                 const scoreB = parseInt(row[3]);
                 const status = (row[6]||"").toUpperCase();
-                if(isNaN(scoreA) || isNaN(scoreB)) continue; // no scores yet
-                const st = status==="FINISHED"?"ft":status==="IN_PLAY"?"live":status==="PAUSED"?"live":"ft";
-                next[matchIdx] = {...next[matchIdx], homeScore:scoreA, awayScore:scoreB, status:st};
+                if(!teamA || !teamB || isNaN(scoreA) || isNaN(scoreB)) continue;
+
+                const idx = findFixtureIdx(teamA, teamB, next);
+                if(idx === -1) continue;
+
+                const st = status==="FINISHED"?"ft":status.includes("PLAY")||status==="PAUSED"?"live":"ft";
+                next[idx] = {...next[idx], homeScore:scoreA, awayScore:scoreB, status:st};
+                updated++;
               }
               return next;
             });
