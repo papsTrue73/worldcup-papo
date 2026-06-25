@@ -27,7 +27,7 @@ const LANG = {
     manualMode: "Modo Manual",
     simulate: "Simular datos de API",
     reset: "Reiniciar datos",
-    matches: "PARTIDOS", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
+    matches: "POR JUGAR", teams: "EQUIPOS", cities: "CIUDADES", views: "VISTAS",
     finished: "finalizados", liveCount: "en vivo", upcomingCount: "próximos",
     // Nav
     navHome: "Inicio", navFixtures: "Partidos", navStats: "Estadísticas", navPolla: "Polla",
@@ -154,7 +154,7 @@ const LANG = {
     dataMode: "Data mode:",
     apiLive: "Live API Connected", demoActive: "Demo Mode Active", manualMode: "Manual Mode",
     simulate: "Simulate API refresh", reset: "Reset data",
-    matches: "MATCHES", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
+    matches: "REMAINING", teams: "TEAMS", cities: "HOST CITIES", views: "VIEWS",
     finished: "completed", liveCount: "live", upcomingCount: "upcoming",
     navHome: "Home", navFixtures: "Fixtures", navStats: "Stats", navPolla: "Bracket",
     statusFt: "Full Time", statusLive: "Live", statusUpcoming: "Upcoming",
@@ -2201,7 +2201,7 @@ export default function App() {
             </div>
             <div style={{display:"flex",alignItems:"center",gap:mobile?8:16}}>
               <Countdown/>
-              {!mobile && [{v:"104",l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities}].map(x=>(
+              {!mobile && [{v:String(fixtures.filter(f=>f.status!=="ft").length),l:t.matches},{v:"48",l:t.teams},{v:"16",l:t.cities}].map(x=>(
                 <div key={x.l} style={{background:"rgba(255,255,255,.1)",borderRadius:8,padding:"6px 12px",textAlign:"center"}}>
                   <span style={{fontFamily:fb,fontSize:20,color:"#fff"}}>{x.v}</span>
                   <span style={{fontSize:12,color:"#D4A843",fontWeight:700,marginLeft:4}}>{x.l}</span>
