@@ -1385,6 +1385,10 @@ function StatBar({label,value,max,color}) {
 //  PAGE 5: POLLA MUNDIALISTA
 // ─────────────────────────────────────────────
 function calcPts(player, fixtures) {
+  // Use official points from Google Sheet Leaderboard tab if available
+  if(player._sheetPoints != null) {
+    return {rPts:0,ePts:0,gPts:0,total:player._sheetPoints,rCount:0,eCount:0,fromSheet:true};
+  }
   let rPts=0,ePts=0,gPts=0,rCount=0,eCount=0;
   fixtures.filter(f=>f.status==="ft"||f.status==="live").forEach(f=>{
     const p=player.matches?.[f.id]; if(!p)return;
@@ -1589,6 +1593,30 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
             });
           }
         } catch(e) { console.warn("Could not read Official Results:", e.message); }
+      }
+
+      // Read "Leaderboard" tab to get official point totals
+      const leaderboardSheetId = ENV_SHEET_USA || ENV_SHEET_FAM;
+      if(leaderboardSheetId) {
+        const sheetsToRead = [
+          {id:ENV_SHEET_USA, group:"friends_usa"},
+          {id:ENV_SHEET_FAM, group:"family"},
+        ];
+        for(const s of sheetsToRead) {
+          if(!s.id) continue;
+          try {
+            const lbRows = await fetchCsv(s.id, "Leaderboard");
+            if(lbRows.length > 1) {
+              for(let r=1; r<lbRows.length; r++) {
+                const name = (lbRows[r][0]||"").trim();
+                const pts = parseInt(lbRows[r][1]);
+                if(!name || isNaN(pts)) continue;
+                const player = allPlayers.find(p=>p.name===name && p.group===s.group);
+                if(player) player._sheetPoints = pts;
+              }
+            }
+          } catch(e) { /* Leaderboard tab may not exist */ }
+        }
       }
 
       setUploaded(allPlayers);
