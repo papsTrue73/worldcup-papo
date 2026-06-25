@@ -1476,6 +1476,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
     "irak":"iraq","noruega":"norway","argelia":"algeria","jordania":"jordan",
     "rd congo":"dr congo","congo dr":"dr congo","inglaterra":"england",
     "croacia":"croatia","panamá":"panama","uzbekistán":"uzbekistan",
+    "brasil":"brazil","marruecos":"morocco",
   };
   const normTeam = (n) => {
     const lower = (n||"").trim().toLowerCase();
