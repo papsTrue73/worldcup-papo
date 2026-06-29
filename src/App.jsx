@@ -850,15 +850,15 @@ function HomePage({fixtures, selectedDate, setSelectedDate, selectedMatch, setSe
 
         {live.length>0 && <>
           <div style={{fontSize:12,fontWeight:700,color:"#ef4444",letterSpacing:1.5,marginBottom:8}}>{t.liveNow}</div>
-          {live.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
+          {live.map(m=><GameCard key={m.matchNum} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
         {jugados.length>0 && <>
           <div style={{fontSize:12,fontWeight:700,color:"#10b981",letterSpacing:1.5,marginBottom:8,marginTop:live.length?16:0}}>{t.completed}</div>
-          {jugados.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
+          {jugados.map(m=><GameCard key={m.matchNum} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
         {upcoming.length>0 && <>
           <div style={{fontSize:12,fontWeight:700,color:"#6B7280",letterSpacing:1.5,marginBottom:8,marginTop:(jugados.length||live.length)?16:0}}>{t.comingNext}</div>
-          {upcoming.map(m=><GameCard key={m.id} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
+          {upcoming.map(m=><GameCard key={m.matchNum} match={m} selected={selectedMatch} onClick={setSelectedMatch}/>)}
         </>}
         {dayMatches.length===0 && <div style={{color:"#6B7280",fontSize:13,padding:20}}>{t.noMatches}</div>}
       </div>
@@ -888,8 +888,24 @@ const KNOCKOUT_INIT = () => ({
 
 function KnockoutBracket({mobile}) {
   const t=_t;
-  const [ko, setKo] = useState(KNOCKOUT_INIT());
   const [koView, setKoView] = useState("bracket");
+
+  // Build knockout rounds from Google Sheet Official Results (M73-M104)
+  const koData = window.__koData || [];
+  const buildRound = (start, count) => {
+    return Array.from({length:count}, (_,i) => {
+      const m = koData.find(d => d.matchNum === start+i);
+      return m || {matchNum:start+i, home:"TBD", away:"TBD", homeScore:null, awayScore:null, status:"upcoming"};
+    });
+  };
+  const ko = {
+    r32: buildRound(73, 16),
+    r16: buildRound(89, 8),
+    qf: buildRound(97, 4),
+    sf: buildRound(101, 2),
+    third: [buildRound(103, 1)[0]],
+    final: [buildRound(104, 1)[0]],
+  };
 
   const roundColors = {r32:"#1B2A6B",r16:"#C8102E",qf:"#009B3A",sf:"#D4A843",final:"#1B2A6B",third:"#6B7280"};
   const roundLabels = {r32:"Octavos",r16:"Cuartos",qf:"Semifinal",sf:"Semifinal",final:"Final",third:"3er Puesto"};
@@ -926,7 +942,7 @@ function KnockoutBracket({mobile}) {
 
   const RoundCol = ({matches, round, compact}) => (
     <div style={{display:"flex",flexDirection:"column",justifyContent:"space-around",gap:compact?6:10,alignItems:"center",flex:"none"}}>
-      {matches.map(m=><MatchCard key={m.id} match={m} round={round} compact={compact}/>)}
+      {matches.map(m=><MatchCard key={m.matchNum} match={m} round={round} compact={compact}/>)}
     </div>
   );
 
@@ -940,7 +956,7 @@ function KnockoutBracket({mobile}) {
       </div>
       {koView==="r32" ? (
         <div style={{display:"grid",gridTemplateColumns:"1fr",gap:8}}>
-          {ko.r32.map(m=><MatchCard key={m.id} match={m} round="r32" compact/>)}
+          {ko.r32.map(m=><MatchCard key={m.matchNum} match={m} round="r32" compact/>)}
         </div>
       ) : (
         <div>
@@ -968,7 +984,7 @@ function KnockoutBracket({mobile}) {
 
     {koView==="r32" ? (
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:12}}>
-        {ko.r32.map(m=><MatchCard key={m.id} match={m} round="r32"/>)}
+        {ko.r32.map(m=><MatchCard key={m.matchNum} match={m} round="r32"/>)}
       </div>
     ) : (
       <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:0,padding:"20px 0"}}>
@@ -1617,6 +1633,37 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
             }
           } catch(e) { /* Leaderboard tab may not exist */ }
         }
+      }
+
+      // Read knockout matches (M73-M104) from Official Results
+      if(resultsSheetId && setFixtures) {
+        try {
+          const resultRows = await fetchCsv(resultsSheetId, "Official Results");
+          if(resultRows.length > 1) {
+            const koData = [];
+            for(let r=1; r<resultRows.length; r++) {
+              const row = resultRows[r];
+              const matchId = (row[0]||"").replace("M","");
+              const matchNum = parseInt(matchId);
+              if(isNaN(matchNum) || matchNum < 73) continue; // only knockout matches
+              const teamA = (row[1]||"").trim();
+              const teamB = (row[4]||"").trim();
+              const scoreA = parseInt(row[2]);
+              const scoreB = parseInt(row[3]);
+              const status = (row[6]||"").toUpperCase();
+              koData.push({
+                matchNum,
+                home: teamA || "TBD",
+                away: teamB || "TBD",
+                homeScore: isNaN(scoreA) ? null : scoreA,
+                awayScore: isNaN(scoreB) ? null : scoreB,
+                status: status==="FINISHED"?"ft":status.includes("PLAY")?"live":"upcoming",
+              });
+            }
+            // Store knockout data for the bracket component
+            window.__koData = koData;
+          }
+        } catch(e) { /* Official Results may not have knockout data yet */ }
       }
 
       setUploaded(allPlayers);
