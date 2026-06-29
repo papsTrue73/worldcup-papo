@@ -378,6 +378,23 @@ const RAW_FIXTURES = [
   {g:"K",h:"Colombia",a:"Portugal",date:"Jun 27",time:"4:00 PM",city:"Miami",venue:"Hard Rock Stadium"},
   {g:"L",h:"Panama",a:"England",date:"Jun 27",time:"10:00 PM",city:"East Rutherford",venue:"MetLife Stadium"},
   {g:"L",h:"Croatia",a:"Ghana",date:"Jun 27",time:"10:00 PM",city:"Foxborough",venue:"Gillette Stadium"},
+  // Round of 32
+  {g:"R32",h:"South Africa",a:"Canada",date:"Jun 28",time:"3:00 PM",city:"Los Angeles",venue:"SoFi Stadium"},
+  {g:"R32",h:"Brazil",a:"Japan",date:"Jun 29",time:"1:00 PM",city:"Houston",venue:"NRG Stadium"},
+  {g:"R32",h:"Germany",a:"Paraguay",date:"Jun 29",time:"4:30 PM",city:"Foxborough",venue:"Gillette Stadium"},
+  {g:"R32",h:"Netherlands",a:"Morocco",date:"Jun 30",time:"1:00 AM",city:"Monterrey",venue:"Estadio BBVA"},
+  {g:"R32",h:"Ivory Coast",a:"Norway",date:"Jun 30",time:"1:00 PM",city:"Arlington",venue:"AT&T Stadium"},
+  {g:"R32",h:"France",a:"Sweden",date:"Jun 30",time:"5:00 PM",city:"East Rutherford",venue:"MetLife Stadium"},
+  {g:"R32",h:"Mexico",a:"Ecuador",date:"Jun 30",time:"9:00 PM",city:"Mexico City",venue:"Estadio Azteca"},
+  {g:"R32",h:"England",a:"DR Congo",date:"Jul 1",time:"12:00 PM",city:"Atlanta",venue:"Mercedes-Benz Stadium"},
+  {g:"R32",h:"Belgium",a:"Senegal",date:"Jul 1",time:"4:00 PM",city:"Seattle",venue:"Lumen Field"},
+  {g:"R32",h:"USA",a:"Bosnia & Herz.",date:"Jul 1",time:"8:00 PM",city:"Santa Clara",venue:"Levi's Stadium"},
+  {g:"R32",h:"Spain",a:"Austria",date:"Jul 2",time:"3:00 PM",city:"Los Angeles",venue:"SoFi Stadium"},
+  {g:"R32",h:"Portugal",a:"Croatia",date:"Jul 2",time:"7:00 PM",city:"Toronto",venue:"BMO Field"},
+  {g:"R32",h:"Switzerland",a:"Algeria",date:"Jul 2",time:"11:00 PM",city:"Vancouver",venue:"BC Place"},
+  {g:"R32",h:"Australia",a:"Egypt",date:"Jul 3",time:"2:00 PM",city:"Arlington",venue:"AT&T Stadium"},
+  {g:"R32",h:"Argentina",a:"Cape Verde",date:"Jul 3",time:"6:00 PM",city:"Miami",venue:"Hard Rock Stadium"},
+  {g:"R32",h:"Colombia",a:"Ghana",date:"Jul 3",time:"9:30 PM",city:"Kansas City",venue:"Arrowhead Stadium"},
 ];
 
 const MATCH_DATES = [...new Set(RAW_FIXTURES.map(f=>f.date))];
