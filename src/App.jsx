@@ -1625,7 +1625,7 @@ function PredictionsPage({fixtures,uploaded,setUploaded,setFixtures}) {
             if(lbRows.length > 1) {
               for(let r=1; r<lbRows.length; r++) {
                 const name = (lbRows[r][0]||"").trim();
-                const pts = parseInt(lbRows[r][1]);
+                const pts = parseInt(lbRows[r][5]);
                 if(!name || isNaN(pts)) continue;
                 const player = allPlayers.find(p=>p.name===name && p.group===s.group);
                 if(player) player._sheetPoints = pts;
